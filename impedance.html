@@ -420,7 +420,7 @@
     <div class="header">
       <div>
         <h1>Impedance Analysis</h1>
-        <p class="subtitle">Analyze impedance data from CSV / Excel files in ZIP archive</p>
+        <p class="subtitle">Analyze Nyquist plot from paired R / X CSV files in ZIP archive</p>
       </div>
     </div>
 
@@ -432,23 +432,15 @@
     </div>
 
     <div class="tabs">
-      <button class="active">Nyquist / Bode</button>
+      <button class="active">Nyquist Plot</button>
       <button onclick="selectAllSamples()">Select All</button>
       <button onclick="exportExcel()">Export Data</button>
     </div>
 
-    <section class="plot-grid">
+    <section class="plot-grid" style="grid-template-columns:1fr;">
       <div class="plot-card">
         <h3>Nyquist Plot</h3>
-        <div id="plot1" class="plot"></div>
-      </div>
-      <div class="plot-card">
-        <h3>Bode Magnitude</h3>
-        <div id="plot2" class="plot"></div>
-      </div>
-      <div class="plot-card">
-        <h3>Bode Phase</h3>
-        <div id="plot3" class="plot"></div>
+        <div id="plot1" class="plot" style="height:620px;"></div>
       </div>
     </section>
 
@@ -458,34 +450,14 @@
         <button class="reset" onclick="resetScale()">Reset</button>
       </div>
 
-      <div class="scale-grid">
+      <div class="scale-grid" style="grid-template-columns:1fr;">
         <div class="scale-box">
-          <h4>Nyquist (Graph 1)</h4>
+          <h4>Nyquist Plot</h4>
           <div class="input-grid">
-            <label>X Min</label><input id="g1xmin" placeholder="Auto" oninput="drawPlots()">
-            <label>X Max</label><input id="g1xmax" placeholder="Auto" oninput="drawPlots()">
-            <label>Y Min</label><input id="g1ymin" placeholder="Auto" oninput="drawPlots()">
-            <label>Y Max</label><input id="g1ymax" placeholder="Auto" oninput="drawPlots()">
-          </div>
-        </div>
-
-        <div class="scale-box">
-          <h4>|Z| – Frequency (Graph 2)</h4>
-          <div class="input-grid">
-            <label>X Min</label><input id="g2xmin" placeholder="Auto" oninput="drawPlots()">
-            <label>X Max</label><input id="g2xmax" placeholder="Auto" oninput="drawPlots()">
-            <label>Y Min</label><input id="g2ymin" placeholder="Auto" oninput="drawPlots()">
-            <label>Y Max</label><input id="g2ymax" placeholder="Auto" oninput="drawPlots()">
-          </div>
-        </div>
-
-        <div class="scale-box">
-          <h4>Phase – Frequency (Graph 3)</h4>
-          <div class="input-grid">
-            <label>X Min</label><input id="g3xmin" placeholder="Auto" oninput="drawPlots()">
-            <label>X Max</label><input id="g3xmax" placeholder="Auto" oninput="drawPlots()">
-            <label>Y Min</label><input id="g3ymin" placeholder="Auto" oninput="drawPlots()">
-            <label>Y Max</label><input id="g3ymax" placeholder="Auto" oninput="drawPlots()">
+            <label>Z' Min</label><input id="g1xmin" placeholder="Auto" oninput="drawPlots()">
+            <label>Z' Max</label><input id="g1xmax" placeholder="Auto" oninput="drawPlots()">
+            <label>|Z''| Min</label><input id="g1ymin" placeholder="Auto" oninput="drawPlots()">
+            <label>|Z''| Max</label><input id="g1ymax" placeholder="Auto" oninput="drawPlots()">
           </div>
         </div>
       </div>
@@ -542,37 +514,11 @@
 
   function pickFile(){ fileInput.click(); }
 
-  function normHeader(x){
-    return String(x ?? '')
-      .normalize('NFKC')
-      .toUpperCase()
-      .replaceAll(' ', '')
-      .replaceAll('_', '')
-      .replaceAll('-', '')
-      .replaceAll('Ω', 'OHM')
-      .replaceAll('Ω', 'OHM')
-      .replaceAll('′', "'")
-      .replaceAll('″', '"');
-  }
-
-  function getIdx(cols, keywords){
-    const colsNorm = cols.map(normHeader);
-    const keysNorm = keywords.map(normHeader);
-    for(let i=0;i<colsNorm.length;i++){
-      if(keysNorm.some(k => colsNorm[i].includes(k))) return i;
-    }
-    return -1;
-  }
-
   function toNum(v){
     if(v === null || v === undefined || v === '') return NaN;
     const s = String(v).replaceAll(',', '').trim();
     const n = Number(s);
     return Number.isFinite(n) ? n : NaN;
-  }
-
-  function cleanLabel(path){
-    return path.replace(/\.[^/.]+$/,'').replaceAll('/','_').replaceAll('\\','_');
   }
 
   function decodeText(arrayBuffer){
@@ -585,101 +531,58 @@
     return new TextDecoder('utf-8', {fatal:false}).decode(arrayBuffer);
   }
 
-  function parseDelimited(arrayBuffer){
+  function parseCsvAfterSkipRows(arrayBuffer, skipRows=3){
     const text = decodeText(arrayBuffer);
-    const rows = [];
-    for(const line of text.split(/\r?\n/)){
+    const lines = text.split(/\r?\n/).slice(skipRows);
+    const col0 = [];
+    const col1 = [];
+
+    for(const line of lines){
       const s = line.trim();
       if(!s || s.startsWith('#')) continue;
+
       const parts = s.includes(',') ? s.split(',').map(v=>v.trim()) : s.split(/[\t ]+/).map(v=>v.trim());
-      rows.push(parts);
+      if(parts.length < 2) continue;
+
+      const x = toNum(parts[0]);
+      const y = toNum(parts[1]);
+      if(Number.isFinite(x) && Number.isFinite(y)){
+        col0.push(x);
+        col1.push(y);
+      }
     }
-    return rows;
+
+    if(col0.length < 3) return null;
+    return { col0, col1 };
   }
 
-  function parseRows(rows){
-    if(rows.length < 3) return null;
-
-    let headerRow = 0;
-    for(let r=0; r<Math.min(10, rows.length); r++){
-      const joined = rows[r].join(' ').toUpperCase();
-      if(/FREQ|HZ|Z|IMPED|REAL|IMAG|PHASE|THETA/.test(joined)){
-        headerRow = r;
-        break;
-      }
-    }
-
-    const header = rows[headerRow];
-    let body = rows.slice(headerRow + 1);
-
-    let idx = {
-      f: getIdx(header, ['FREQ', 'FREQUENCY', 'HZ']),
-      zr: getIdx(header, ["Z'", 'ZREAL', 'REALZ', 'RE(Z)', 'RS']),
-      zi: getIdx(header, ['Z"', 'ZIMAG', 'IMAGZ', 'IM(Z)', '-Z"', '-ZIMAG']),
-      zmag: getIdx(header, ['|Z|', 'ZMAG', 'MAGNITUDE', 'IMPEDANCE']),
-      phase: getIdx(header, ['PHASE', 'THETA', 'DEG'])
-    };
-
-    const anyFound = Object.values(idx).some(v => v >= 0);
-    if(!anyFound){
-      body = rows;
-      idx = { f:0, zr:1, zi:2, zmag:3, phase:4 };
-    }
-
-    const F=[], Zr=[], Zi=[], Zmag=[], Phase=[];
-
-    for(const row of body){
-      const f = idx.f >= 0 ? toNum(row[idx.f]) : NaN;
-      let zr = idx.zr >= 0 ? toNum(row[idx.zr]) : NaN;
-      let zi = idx.zi >= 0 ? toNum(row[idx.zi]) : NaN;
-      let zm = idx.zmag >= 0 ? toNum(row[idx.zmag]) : NaN;
-      let ph = idx.phase >= 0 ? toNum(row[idx.phase]) : NaN;
-
-      if(!Number.isFinite(f)) continue;
-
-      if(!Number.isFinite(zm) && Number.isFinite(zr) && Number.isFinite(zi)){
-        zm = Math.sqrt(zr*zr + zi*zi);
-      }
-
-      if(!Number.isFinite(ph) && Number.isFinite(zr) && Number.isFinite(zi)){
-        ph = Math.atan2(zi, zr) * 180 / Math.PI;
-      }
-
-      if(!Number.isFinite(zr) && Number.isFinite(zm) && Number.isFinite(ph)){
-        zr = zm * Math.cos(ph * Math.PI / 180);
-      }
-
-      if(!Number.isFinite(zi) && Number.isFinite(zm) && Number.isFinite(ph)){
-        zi = zm * Math.sin(ph * Math.PI / 180);
-      }
-
-      if(!Number.isFinite(zr) || !Number.isFinite(zi)) continue;
-
-      F.push(f);
-      Zr.push(zr);
-      Zi.push(zi);
-      Zmag.push(Number.isFinite(zm) ? zm : Math.sqrt(zr*zr + zi*zi));
-      Phase.push(Number.isFinite(ph) ? ph : Math.atan2(zi, zr) * 180 / Math.PI);
-    }
-
-    if(F.length < 3) return null;
-    return { F, Zr, Zi, Zmag, Phase };
+  function getBaseName(path){
+    return path.split('/').pop().split('\\').pop();
   }
 
-  async function parseFile(entry){
-    const name = entry.name.toLowerCase();
-    const buf = await entry.async('arraybuffer');
+  function getDirName(path){
+    const idx1 = path.lastIndexOf('/');
+    const idx2 = path.lastIndexOf('\\');
+    const idx = Math.max(idx1, idx2);
+    return idx >= 0 ? path.slice(0, idx) : '';
+  }
 
-    if(name.endsWith('.csv') || name.endsWith('.txt')){
-      return parseRows(parseDelimited(buf));
-    }
+  function makeSampleId(path){
+    const dirName = getDirName(path);
+    const baseName = getBaseName(path);
+    const dotRemoved = baseName.replace(/\.csv$/i, '');
 
-    const wb = XLSX.read(buf, {type:'array'});
-    const targetSheet =
-      wb.SheetNames.find(s => /imp|eis|z|nyquist|bode/i.test(s)) || wb.SheetNames[0];
-    const ws = wb.Sheets[targetSheet];
-    const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:true, defval:null});
-    return parseRows(rows);
+    if(!dotRemoved.includes('_')) return null;
+
+    const cut = dotRemoved.lastIndexOf('_');
+    const prefix = dotRemoved.slice(0, cut);
+    const suffix = dotRemoved.slice(cut + 1).toUpperCase();
+
+    let fullSampleId = (dirName ? dirName + '/' : '') + prefix;
+    fullSampleId = fullSampleId.replaceAll('/', '_').replaceAll('\\', '_');
+    if(fullSampleId.startsWith('_')) fullSampleId = fullSampleId.slice(1);
+
+    return { sampleId: fullSampleId, suffix };
   }
 
   async function handleZipUpload(event){
@@ -693,38 +596,66 @@
     masterData = {};
     sampleOrder = [];
     selectedSamples = [];
+    focusedSample = null;
 
     try{
       const zip = await JSZip.loadAsync(file);
-      const entries = Object.values(zip.files).filter(f=>{
+      const csvEntries = Object.values(zip.files).filter(f=>{
         const n = f.name.toLowerCase();
-        const base = n.split('/').pop();
-        return !f.dir &&
-          (n.endsWith('.csv') || n.endsWith('.txt') || n.endsWith('.xls') || n.endsWith('.xlsx')) &&
-          !base.startsWith('~$') &&
-          !n.includes('__macosx');
+        const base = getBaseName(n);
+        return !f.dir && n.endsWith('.csv') && !base.startsWith('~$') && !n.includes('__macosx');
       });
 
-      for(const entry of entries){
-        try{
-          const parsed = await parseFile(entry);
-          if(!parsed) continue;
+      const fileGroups = {};
 
-          const label = cleanLabel(entry.name);
-          masterData[label] = {...parsed, file:entry.name};
-          sampleOrder.push(label);
+      for(const entry of csvEntries){
+        const info = makeSampleId(entry.name);
+        if(!info) continue;
+
+        if(!fileGroups[info.sampleId]) fileGroups[info.sampleId] = {};
+        fileGroups[info.sampleId][info.suffix] = entry;
+      }
+
+      const sampleIds = Object.keys(fileGroups).sort();
+
+      for(const sampleId of sampleIds){
+        const group = fileGroups[sampleId];
+
+        if(!group.R || !group.X) continue;
+
+        try{
+          const rBuf = await group.R.async('arraybuffer');
+          const xBuf = await group.X.async('arraybuffer');
+
+          const rData = parseCsvAfterSkipRows(rBuf, 3);
+          const xData = parseCsvAfterSkipRows(xBuf, 3);
+
+          if(!rData || !xData) continue;
+
+          const n = Math.min(rData.col0.length, rData.col1.length, xData.col1.length);
+          if(n < 3) continue;
+
+          masterData[sampleId] = {
+            Freq: rData.col0.slice(0, n),
+            Z_real: rData.col1.slice(0, n),
+            Z_imag_abs: xData.col1.slice(0, n).map(v => Math.abs(v)),
+            fileR: group.R.name,
+            fileX: group.X.name
+          };
+          sampleOrder.push(sampleId);
         }catch(e){
-          console.warn('skip:', entry.name, e);
+          console.warn('skip sample:', sampleId, e);
         }
       }
 
       if(sampleOrder.length === 0){
-        document.getElementById('sumStatus').textContent = 'No valid data';
-        alert("인식 실패: ZIP 안 파일에서 frequency, Zreal, Zimag 또는 |Z|/phase 열을 찾지 못했습니다.");
+        document.getElementById('sumStatus').textContent = 'No valid R/X CSV pair';
+        alert("인식 실패: ZIP 안에 같은 접두사를 가진 *_R.csv 와 *_X.csv 쌍이 있는지 확인해주세요. 예: Sample1_R.csv / Sample1_X.csv");
         return;
       }
 
       selectedSamples = [...sampleOrder];
+      focusedSample = selectedSamples[0] || null;
       updateSampleSelect();
       updateSummary();
       drawPlots();
@@ -739,7 +670,7 @@
   function updateSummary(){
     document.getElementById('sumSamples').textContent = sampleOrder.length;
     let points = 0;
-    for(const s of sampleOrder) points += masterData[s]?.F?.length || 0;
+    for(const s of sampleOrder) points += masterData[s]?.Freq?.length || 0;
     document.getElementById('sumPoints').textContent = points.toLocaleString();
   }
 
@@ -769,11 +700,6 @@
     drawPlots();
   }
 
-  function syncSelected(){
-    updateSampleSelect();
-    drawPlots();
-  }
-
   function selectAllSamples(){
     selectedSamples = [...sampleOrder];
     focusedSample = selectedSamples[0] || null;
@@ -787,6 +713,7 @@
       alert('정렬할 샘플을 하나 클릭해주세요.');
       return;
     }
+
     const idx = sampleOrder.indexOf(name);
     const newIdx = idx + direction;
     if(newIdx < 0 || newIdx >= sampleOrder.length) return;
@@ -819,92 +746,72 @@
     return {
       x, y, name,
       mode:'lines+markers',
-      line:{width:2.2, color:colors[i % colors.length]},
+      line:{width:2.5, color:colors[i % colors.length]},
       marker:{
         symbol:markers[i % markers.length],
-        size:6,
+        size:8,
         color:'white',
-        line:{color:colors[i % colors.length], width:1.5}
+        line:{color:colors[i % colors.length], width:1.8}
       },
       connectgaps:false
-    };
-  }
-
-  function baseLayout(xTitle,yTitle){
-    return {
-      margin:{l:70,r:30,t:10,b:60},
-      paper_bgcolor:'#ffffff',
-      plot_bgcolor:'#ffffff',
-      font:{family:'Arial, Noto Sans KR, sans-serif', size:12},
-      xaxis:{
-        title:xTitle,
-        showgrid:true,
-        gridcolor:'#e9e9e9',
-        zeroline:false,
-        linecolor:'#333',
-        mirror:true,
-        ticks:'inside'
-      },
-      yaxis:{
-        title:yTitle,
-        showgrid:true,
-        gridcolor:'#e9e9e9',
-        zeroline:false,
-        linecolor:'#333',
-        mirror:true,
-        ticks:'inside'
-      },
-      legend:{
-        x:1.02,
-        y:1,
-        font:{size:9},
-        bgcolor:'rgba(255,255,255,0)'
-      }
     };
   }
 
   function drawPlots(){
     const selected = selectedSamples.filter(s=>masterData[s]);
     if(selected.length === 0){
-      Plotly.purge('plot1'); Plotly.purge('plot2'); Plotly.purge('plot3');
+      Plotly.purge('plot1');
       return;
     }
 
-    const t1=[], t2=[], t3=[];
-    selected.forEach((s,i)=>{
+    const traces = selected.map((s,i)=>{
       const d = masterData[s];
-      t1.push(makeTrace(d.Zr, d.Zi.map(v=>-v), s, i));
-      t2.push(makeTrace(d.F, d.Zmag, s, i));
-      t3.push(makeTrace(d.F, d.Phase, s, i));
+      return makeTrace(d.Z_real, d.Z_imag_abs, s, i);
     });
 
-    const l1 = baseLayout("Z' (Ω)", "-Z'' (Ω)");
-    const l2 = baseLayout("Frequency (Hz)", "|Z| (Ω)");
-    const l3 = baseLayout("Frequency (Hz)", "Phase (deg)");
+    const layout = {
+      margin:{l:90,r:40,t:18,b:75},
+      paper_bgcolor:'#ffffff',
+      plot_bgcolor:'#ffffff',
+      font:{family:'Arial, Noto Sans KR, sans-serif', size:13},
+      xaxis:{
+        title:{text:"Z' (Ω)", font:{size:20}},
+        showgrid:true,
+        gridcolor:'#e9e9e9',
+        zeroline:false,
+        linecolor:'#333',
+        linewidth:1.5,
+        mirror:true,
+        ticks:'inside',
+        scaleanchor:'y',
+        scaleratio:1
+      },
+      yaxis:{
+        title:{text:"|Z''| (Ω)", font:{size:20}},
+        showgrid:true,
+        gridcolor:'#e9e9e9',
+        zeroline:false,
+        linecolor:'#333',
+        linewidth:1.5,
+        mirror:true,
+        ticks:'inside'
+      },
+      legend:{
+        x:1.02,
+        y:1,
+        font:{size:11},
+        bgcolor:'rgba(255,255,255,0)'
+      }
+    };
 
-    l2.xaxis.type = 'log';
-    l2.yaxis.type = 'log';
-    l3.xaxis.type = 'log';
+    applyRange(layout, 'xaxis', 'g1xmin', 'g1xmax');
+    applyRange(layout, 'yaxis', 'g1ymin', 'g1ymax');
 
-    applyRange(l1, 'xaxis', 'g1xmin', 'g1xmax');
-    applyRange(l1, 'yaxis', 'g1ymin', 'g1ymax');
-    applyRange(l2, 'xaxis', 'g2xmin', 'g2xmax');
-    applyRange(l2, 'yaxis', 'g2ymin', 'g2ymax');
-    applyRange(l3, 'xaxis', 'g3xmin', 'g3xmax');
-    applyRange(l3, 'yaxis', 'g3ymin', 'g3ymax');
-
-    const config = {responsive:true, displayModeBar:true};
-    Plotly.react('plot1', t1, l1, config);
-    Plotly.react('plot2', t2, l2, config);
-    Plotly.react('plot3', t3, l3, config);
+    Plotly.react('plot1', traces, layout, {responsive:true, displayModeBar:true});
   }
 
   function resetScale(){
-    [
-      'g1xmin','g1xmax','g1ymin','g1ymax',
-      'g2xmin','g2xmax','g2ymin','g2ymax',
-      'g3xmin','g3xmax','g3ymin','g3ymax'
-    ].forEach(id=>document.getElementById(id).value='');
+    ['g1xmin','g1xmax','g1ymin','g1ymax'].forEach(id=>document.getElementById(id).value='');
     drawPlots();
   }
 
@@ -926,22 +833,19 @@
 
     const wb = XLSX.utils.book_new();
     const cols = [];
-    const meta = [['sample','zip_path','columns']];
+    const meta = [['sample','R_file','X_file','note']];
 
     ordered.forEach(s=>{
       const d = masterData[s];
-      cols.push({name:`${s}_Frequency (Hz)`, data:d.F});
-      cols.push({name:`${s}_Zreal (ohm)`, data:d.Zr});
-      cols.push({name:`${s}_Zimag (ohm)`, data:d.Zi});
-      cols.push({name:`${s}_Minus_Zimag (ohm)`, data:d.Zi.map(v=>-v)});
-      cols.push({name:`${s}_Zmag (ohm)`, data:d.Zmag});
-      cols.push({name:`${s}_Phase (deg)`, data:d.Phase});
-      meta.push([s, d.file, "Frequency, Zreal, Zimag, |Z|, Phase"]);
+      cols.push({name:`${s}_Freq`, data:d.Freq});
+      cols.push({name:`${s}_Z_real`, data:d.Z_real});
+      cols.push({name:`${s}_|Z_imag|`, data:d.Z_imag_abs});
+      meta.push([s, d.fileR, d.fileX, "Z_real from *_R.csv second column, |Z_imag| from *_X.csv second column after skiprows=3"]);
     });
 
-    XLSX.utils.book_append_sheet(wb, sheetFromColumns(cols), 'Impedance');
+    XLSX.utils.book_append_sheet(wb, sheetFromColumns(cols), 'Data');
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(meta), 'Meta');
-    XLSX.writeFile(wb, 'Impedance_Report.xlsx');
+    XLSX.writeFile(wb, 'Impedance_Analysis_Report.xlsx');
   }
 </script>
 </body>
