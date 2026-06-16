@@ -285,6 +285,43 @@
       font-size: 12px;
     }
 
+
+    .sample-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 18px;
+      background:#fff;
+    }
+    .sample-card h3 {
+      margin: 0 0 12px;
+      color: var(--main);
+      font-size: 17px;
+    }
+    .sample-layout {
+      display: grid;
+      grid-template-columns: 1fr 150px;
+      gap: 14px;
+    }
+    .sample-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sample-buttons button {
+      padding: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 7px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .sample-buttons button.export {
+      background: var(--main);
+      color: #fff;
+      border-color: var(--main);
+    }
+
     .bottom-tools {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -452,6 +489,37 @@
       font-weight: 700;
     }
 
+
+    .sample-list{
+      width:100%;
+      height:240px;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:8px;
+      background:#fff;
+    }
+    .sample-item{
+      padding:9px 10px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:14px;
+      line-height:1.35;
+      user-select:none;
+      margin-bottom:4px;
+      border:1px solid transparent;
+    }
+    .sample-item:hover{
+      background:#fff6f9;
+      color:var(--main);
+    }
+    .sample-item.selected{
+      background:var(--soft);
+      color:var(--main);
+      border-color:#edc6d5;
+      font-weight:800;
+    }
+
     footer {
       text-align: center;
       color: #777;
@@ -516,8 +584,22 @@
       <button>EQE</button>
       <button>Power Efficiency</button>
       <button>Luminance</button>
-      <button onclick="openSampleModal()">Sample Select / Sort</button>
+      <button onclick="selectAllSamples()">Select All</button>
     </div>
+
+
+    <section class="sample-card">
+      <h3>샘플 선택 / 정렬</h3>
+      <div class="sample-layout">
+        <div id="sampleList" class="sample-list"></div>
+        <div class="sample-buttons">
+          <button onclick="moveSample(-1)">▲ 위로 이동</button>
+          <button onclick="moveSample(1)">▼ 아래로 이동</button>
+          <button onclick="selectAllSamples()">전체 선택</button>
+          <button class="export" onclick="exportExcel()">데이터 추출</button>
+        </div>
+      </div>
+    </section>
 
     <div class="chart-grid">
       <div class="card">
@@ -630,22 +712,6 @@
   </section>
 </div>
 
-<div id="samplePanel" class="sample-panel">
-  <div class="sample-modal">
-    <h3>샘플 선택 / 정렬</h3>
-    <p style="color:#666;font-size:13px;">Ctrl 또는 Shift로 여러 샘플을 선택할 수 있습니다.</p>
-    <div class="sample-body">
-      <select id="sampleSelect" multiple onchange="syncSelectedFromModal()"></select>
-      <div class="sample-actions">
-        <button onclick="moveSample(-1)">▲ 위로 이동</button>
-        <button onclick="moveSample(1)">▼ 아래로 이동</button>
-        <button onclick="selectAllSamples()">전체 선택</button>
-        <button onclick="closeSampleModal()">닫기</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
   const colors = ['#000000', '#00A852', '#E41A1C', '#377EB8', '#984EA3', '#FF7F00', '#A65628', '#F781BF'];
   const markers = ['triangle-up', 'circle', 'square', 'diamond', 'triangle-down', 'pentagon', 'star', 'hexagon'];
@@ -653,6 +719,7 @@
   let masterData = {};
   let sampleOrder = [];
   let selectedSamples = [];
+  let focusedSample = null;
 
   const fileInput = document.getElementById('fileInput');
   fileInput.addEventListener('change', handleZipUpload);
@@ -925,54 +992,65 @@
     drawPlots();
   }
 
-  function updateSampleSelect() {
-    const sel = document.getElementById('sampleSelect');
-    sel.innerHTML = '';
-    sampleOrder.forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s;
-      opt.textContent = s;
-      opt.selected = selectedSamples.includes(s);
-      sel.appendChild(opt);
+  function updateSampleSelect(){
+    const box = document.getElementById('sampleList');
+    if(!box) return;
+    box.innerHTML = '';
+    sampleOrder.forEach(s=>{
+      const item = document.createElement('div');
+      item.className = 'sample-item' + (selectedSamples.includes(s) ? ' selected' : '');
+      item.textContent = s;
+      item.title = s;
+      item.onclick = () => toggleSample(s);
+      box.appendChild(item);
     });
   }
 
-  function openSampleModal() {
+  function toggleSample(name){
+    focusedSample = name;
+    if(selectedSamples.includes(name)){
+      selectedSamples = selectedSamples.filter(s => s !== name);
+    }else{
+      selectedSamples.push(name);
+      selectedSamples.sort((a,b)=>sampleOrder.indexOf(a)-sampleOrder.indexOf(b));
+    }
     updateSampleSelect();
-    document.getElementById('samplePanel').style.display = 'flex';
-  }
-
-  function closeSampleModal() {
-    document.getElementById('samplePanel').style.display = 'none';
     drawPlots();
   }
 
-  function syncSelectedFromModal() {
-    const sel = document.getElementById('sampleSelect');
-    selectedSamples = Array.from(sel.selectedOptions).map(o => o.value);
+  function openSampleModal(){
+    updateSampleSelect();
+  }
+
+  function closeSampleModal(){
     drawPlots();
   }
 
-  function selectAllSamples() {
+  function syncSelectedFromModal(){
+    updateSampleSelect();
+    drawPlots();
+  }
+
+  function selectAllSamples(){
     selectedSamples = [...sampleOrder];
+    focusedSample = selectedSamples[0] || null;
     updateSampleSelect();
     drawPlots();
   }
 
-  function moveSample(direction) {
-    const sel = document.getElementById('sampleSelect');
-    const selected = Array.from(sel.selectedOptions).map(o => o.value);
-    if (selected.length !== 1) return alert('정렬은 샘플 1개만 선택했을 때 가능합니다.');
-
-    const name = selected[0];
+  function moveSample(direction){
+    const name = focusedSample || (selectedSamples.length === 1 ? selectedSamples[0] : null);
+    if(!name){
+      alert('정렬할 샘플을 하나 클릭해주세요.');
+      return;
+    }
     const idx = sampleOrder.indexOf(name);
     const newIdx = idx + direction;
-    if (newIdx < 0 || newIdx >= sampleOrder.length) return;
+    if(newIdx < 0 || newIdx >= sampleOrder.length) return;
 
     [sampleOrder[idx], sampleOrder[newIdx]] = [sampleOrder[newIdx], sampleOrder[idx]];
-    selectedSamples = selectedSamples.sort((a, b) => sampleOrder.indexOf(a) - sampleOrder.indexOf(b));
+    selectedSamples = selectedSamples.sort((a,b)=>sampleOrder.indexOf(a)-sampleOrder.indexOf(b));
     updateSampleSelect();
-    sel.value = name;
     drawPlots();
   }
 

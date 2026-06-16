@@ -329,6 +329,37 @@
       font-weight:400;
       margin-top:6px;
     }
+
+    .sample-list{
+      width:100%;
+      height:240px;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:8px;
+      background:#fff;
+    }
+    .sample-item{
+      padding:9px 10px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:14px;
+      line-height:1.35;
+      user-select:none;
+      margin-bottom:4px;
+      border:1px solid transparent;
+    }
+    .sample-item:hover{
+      background:#fff6f9;
+      color:var(--main);
+    }
+    .sample-item.selected{
+      background:var(--soft);
+      color:var(--main);
+      border-color:#edc6d5;
+      font-weight:800;
+    }
+    
     footer{
       text-align:center;
       color:#888;
@@ -420,7 +451,7 @@
     <section class="sample-card">
       <h3>샘플 선택 / 정렬</h3>
       <div class="sample-layout">
-        <select id="sampleSelect" multiple onchange="syncSelected()"></select>
+        <div id="sampleList" class="sample-list"></div>
         <div class="sample-buttons">
           <button onclick="moveSample(-1)">▲ 위로 이동</button>
           <button onclick="moveSample(1)">▼ 아래로 이동</button>
@@ -461,6 +492,7 @@
   let masterData = {};
   let sampleOrder = [];
   let selectedSamples = [];
+  let focusedSample = null;
 
   const fileInput = document.getElementById('fileInput');
   fileInput.addEventListener('change', handleZipUpload);
@@ -571,38 +603,49 @@
   }
 
   function updateSampleSelect(){
-    const sel = document.getElementById('sampleSelect');
-    sel.innerHTML = '';
+    const box = document.getElementById('sampleList');
+    if(!box) return;
+    box.innerHTML = '';
     sampleOrder.forEach(s=>{
-      const opt = document.createElement('option');
-      opt.value = s;
-      opt.textContent = s;
-      opt.selected = selectedSamples.includes(s);
-      sel.appendChild(opt);
+      const item = document.createElement('div');
+      item.className = 'sample-item' + (selectedSamples.includes(s) ? ' selected' : '');
+      item.textContent = s;
+      item.title = s;
+      item.onclick = () => toggleSample(s);
+      box.appendChild(item);
     });
   }
 
+  function toggleSample(name){
+    focusedSample = name;
+    if(selectedSamples.includes(name)){
+      selectedSamples = selectedSamples.filter(s => s !== name);
+    }else{
+      selectedSamples.push(name);
+      selectedSamples.sort((a,b)=>sampleOrder.indexOf(a)-sampleOrder.indexOf(b));
+    }
+    updateSampleSelect();
+    drawPlot();
+  }
+
   function syncSelected(){
-    const sel = document.getElementById('sampleSelect');
-    selectedSamples = Array.from(sel.selectedOptions).map(o=>o.value);
+    updateSampleSelect();
     drawPlot();
   }
 
   function selectAllSamples(){
     selectedSamples = [...sampleOrder];
+    focusedSample = selectedSamples[0] || null;
     updateSampleSelect();
     drawPlot();
   }
 
   function moveSample(direction){
-    const sel = document.getElementById('sampleSelect');
-    const selected = Array.from(sel.selectedOptions).map(o=>o.value);
-    if(selected.length !== 1){
-      alert('정렬은 샘플 1개만 선택했을 때 가능합니다.');
+    const name = focusedSample || (selectedSamples.length === 1 ? selectedSamples[0] : null);
+    if(!name){
+      alert('정렬할 샘플을 하나 클릭해주세요.');
       return;
     }
-
-    const name = selected[0];
     const idx = sampleOrder.indexOf(name);
     const newIdx = idx + direction;
     if(newIdx < 0 || newIdx >= sampleOrder.length) return;
@@ -610,7 +653,6 @@
     [sampleOrder[idx], sampleOrder[newIdx]] = [sampleOrder[newIdx], sampleOrder[idx]];
     selectedSamples = selectedSamples.sort((a,b)=>sampleOrder.indexOf(a)-sampleOrder.indexOf(b));
     updateSampleSelect();
-    document.getElementById('sampleSelect').value = name;
     drawPlot();
   }
 
