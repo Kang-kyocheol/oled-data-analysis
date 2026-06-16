@@ -6,394 +6,64 @@
   <title>Impedance Analysis</title>
 
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
     :root{
-      --main:#a0003b;
-      --main-dark:#850030;
-      --soft:#f9eef3;
-      --line:#e9e9ee;
-      --text:#191a20;
-      --muted:#667085;
-      --bg:#f6f6f8;
-      --card:#fff;
+      --main:#a0003b; --main-dark:#850030; --soft:#f9eef3;
+      --line:#e9e9ee; --text:#191a20; --muted:#667085; --bg:#f6f6f8;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Arial,"Noto Sans KR",sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    .app{
-      width:min(1720px,calc(100% - 20px));
-      min-height:100vh;
-      margin:10px auto;
-      background:#fff;
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 16px 40px rgba(0,0,0,.08);
-      display:grid;
-      grid-template-columns:300px 1fr 330px;
-    }
-    aside{
-      border-right:1px solid var(--line);
-      padding:38px 24px;
-      background:#fff;
-      display:flex;
-      flex-direction:column;
-    }
-    .brand h2{
-      margin:0 0 9px;
-      color:var(--main);
-      font-size:22px;
-    }
-    .brand p{
-      margin:0;
-      color:#465064;
-      font-size:14px;
-      line-height:1.5;
-    }
-    nav{
-      margin-top:46px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    nav a{
-      text-decoration:none;
-      color:#444b59;
-      font-weight:700;
-      padding:15px 16px;
-      border-radius:8px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      transition:.18s;
-    }
+    body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--text)}
+    .app{width:min(1720px,calc(100% - 20px));min-height:100vh;margin:10px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.08);display:grid;grid-template-columns:300px 1fr 330px}
+    aside{border-right:1px solid var(--line);padding:38px 24px;background:#fff;display:flex;flex-direction:column}
+    .brand h2{margin:0 0 9px;color:var(--main);font-size:22px}
+    .brand p{margin:0;color:#465064;font-size:14px;line-height:1.5}
+    nav{margin-top:46px;display:flex;flex-direction:column;gap:12px}
+    nav a{text-decoration:none;color:#444b59;font-weight:700;padding:15px 16px;border-radius:8px;display:flex;align-items:center;gap:12px}
     nav a:hover{background:#fff6f9;color:var(--main)}
     nav a.active{background:var(--soft);color:var(--main)}
     .nav-icon{width:24px;text-align:center;color:var(--main);font-size:19px}
-    .upload-side{
-      margin-top:auto;
-      width:100%;
-      padding:14px 12px;
-      border:1.5px solid var(--main);
-      color:var(--main);
-      background:#fff;
-      border-radius:7px;
-      font-weight:800;
-      cursor:pointer;
-    }
-
+    .upload-side{margin-top:auto;width:100%;padding:14px 12px;border:1.5px solid var(--main);color:var(--main);background:#fff;border-radius:7px;font-weight:800;cursor:pointer}
     main{padding:38px 32px 22px}
-    .header{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      margin-bottom:30px;
-    }
-    h1{
-      margin:0 0 8px;
-      font-size:32px;
-      letter-spacing:-.6px;
-    }
-    .subtitle{
-      margin:0;
-      color:#4d5565;
-      font-size:15px;
-    }
-
-    .file-row{
-      display:grid;
-      grid-template-columns:140px 1fr 180px;
-      gap:14px;
-      margin-bottom:24px;
-      align-items:stretch;
-    }
-    .file-label,.file-name{
-      border:1px solid var(--line);
-      padding:14px 18px;
-      background:#fff;
-      font-size:14px;
-    }
-    .file-label{
-      font-weight:800;
-      border-radius:7px 0 0 7px;
-      background:#fafafa;
-    }
-    .file-name{
-      border-left:0;
-      border-radius:0 7px 7px 0;
-      color:#444;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-    .primary{
-      border:0;
-      background:linear-gradient(180deg,var(--main),var(--main-dark));
-      color:#fff;
-      border-radius:7px;
-      font-weight:800;
-      cursor:pointer;
-      box-shadow:0 8px 18px rgba(160,0,59,.18);
-    }
+    .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px}
+    h1{margin:0 0 8px;font-size:32px;letter-spacing:-.6px}
+    .subtitle{margin:0;color:#4d5565;font-size:15px}
+    .file-row{display:grid;grid-template-columns:140px 1fr 180px;gap:14px;margin-bottom:24px;align-items:stretch}
+    .file-label,.file-name{border:1px solid var(--line);padding:14px 18px;background:#fff;font-size:14px}
+    .file-label{font-weight:800;border-radius:7px 0 0 7px;background:#fafafa}
+    .file-name{border-left:0;border-radius:0 7px 7px 0;color:#444;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .primary{border:0;background:linear-gradient(180deg,var(--main),var(--main-dark));color:#fff;border-radius:7px;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(160,0,59,.18)}
     #fileInput{display:none}
-
-    .tabs{
-      display:flex;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:22px;
-    }
-    .tabs button{
-      border:1px solid var(--line);
-      background:#fff;
-      padding:12px 24px;
-      border-radius:7px;
-      font-weight:800;
-      cursor:pointer;
-    }
-    .tabs button.active{
-      background:var(--main);
-      color:#fff;
-      border-color:var(--main);
-    }
-
-    .plot-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
-      margin-bottom:18px;
-    }
-    .plot-card{
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
-      padding:16px;
-      min-width:0;
-    }
-    .plot-card h3{
-      margin:0 0 12px;
-      text-align:center;
-      color:var(--main);
-      font-size:16px;
-    }
-    .plot{
-      width:100%;
-      height:410px;
-    }
-
-    .control-card{
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
-      padding:18px;
-      margin-bottom:18px;
-    }
-    .control-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:16px;
-    }
-    .control-head strong{
-      color:var(--main);
-      font-size:18px;
-    }
-    .reset{
-      border:1px solid var(--main);
-      color:var(--main);
-      background:#fff;
-      padding:9px 24px;
-      border-radius:6px;
-      font-weight:800;
-      cursor:pointer;
-    }
-    .scale-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-    }
-    .scale-box{
-      border:1px solid var(--line);
-      border-radius:10px;
-      padding:14px;
-    }
-    .scale-box h4{
-      margin:0 0 12px;
-      color:var(--main);
-      font-size:14px;
-    }
-    .input-grid{
-      display:grid;
-      grid-template-columns:58px 1fr 58px 1fr;
-      gap:8px;
-      align-items:center;
-      font-size:12px;
-      color:#555;
-      font-weight:700;
-    }
-    .input-grid input{
-      width:100%;
-      border:1px solid var(--line);
-      border-radius:6px;
-      padding:9px 8px;
-      font-size:13px;
-    }
-
-    .sample-card{
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
-      padding:18px;
-      margin-bottom:18px;
-    }
-    .sample-card h3{
-      margin:0 0 12px;
-      color:var(--main);
-      font-size:18px;
-    }
-    .sample-layout{
-      display:grid;
-      grid-template-columns:1fr 150px;
-      gap:14px;
-    }
-    select[multiple]{
-      width:100%;
-      height:220px;
-      border:1px solid var(--line);
-      border-radius:8px;
-      padding:8px;
-      font-size:14px;
-    }
-    .sample-buttons{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .sample-buttons button{
-      padding:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:7px;
-      font-weight:800;
-      cursor:pointer;
-    }
-    .sample-buttons button.export{
-      background:var(--main);
-      color:#fff;
-      border-color:var(--main);
-    }
-
-    .right{
-      border-left:1px solid var(--line);
-      padding:116px 24px 24px 0;
-      background:#fff;
-    }
-    .side-card{
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:22px;
-      margin-bottom:22px;
-      background:#fff;
-    }
-    .side-card h3{
-      color:var(--main);
-      margin:0 0 20px;
-      font-size:18px;
-    }
-    .summary-row{
-      margin-bottom:17px;
-      font-size:14px;
-      line-height:1.5;
-    }
-    .summary-row strong{
-      display:block;
-      color:#636b7a;
-      margin-bottom:2px;
-    }
+    .tabs{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+    .tabs button{border:1px solid var(--line);background:#fff;padding:12px 24px;border-radius:7px;font-weight:800;cursor:pointer}
+    .tabs button.active{background:var(--main);color:#fff;border-color:var(--main)}
+    .plot-card,.control-card,.sample-card,.side-card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:18px;margin-bottom:18px}
+    .plot-card h3,.sample-card h3,.side-card h3{margin:0 0 12px;color:var(--main)}
+    #plot1{width:100%;height:620px}
+    .control-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .control-head strong{color:var(--main);font-size:18px}
+    .reset{border:1px solid var(--main);color:var(--main);background:#fff;padding:9px 24px;border-radius:6px;font-weight:800;cursor:pointer}
+    .scale-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .scale-grid label{font-size:13px;color:#555;font-weight:700}
+    .scale-grid input{width:100%;margin-top:7px;border:1px solid var(--line);border-radius:6px;padding:11px 10px;font-size:14px}
+    .sample-layout{display:grid;grid-template-columns:1fr 150px;gap:14px}
+    .sample-list{width:100%;height:240px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff}
+    .sample-item{padding:9px 10px;border-radius:6px;cursor:pointer;font-size:14px;line-height:1.35;user-select:none;margin-bottom:4px;border:1px solid transparent}
+    .sample-item:hover{background:#fff6f9;color:var(--main)}
+    .sample-item.selected{background:var(--soft);color:var(--main);border-color:#edc6d5;font-weight:800}
+    .sample-buttons{display:flex;flex-direction:column;gap:10px}
+    .sample-buttons button{padding:12px;border:1px solid var(--line);background:#fff;border-radius:7px;font-weight:800;cursor:pointer}
+    .sample-buttons button.export{background:var(--main);color:#fff;border-color:var(--main)}
+    .right{border-left:1px solid var(--line);padding:116px 24px 24px 0;background:#fff}
+    .summary-row{margin-bottom:17px;font-size:14px;line-height:1.5}
+    .summary-row strong{display:block;color:#636b7a;margin-bottom:2px}
     .ok{color:#16a34a;font-weight:800}
-    .download{
-      width:100%;
-      padding:14px;
-      border:0;
-      border-radius:7px;
-      background:linear-gradient(180deg,var(--main),var(--main-dark));
-      color:#fff;
-      font-weight:800;
-      cursor:pointer;
-      margin-top:8px;
-    }
-    .tool-list{
-      display:flex;
-      flex-direction:column;
-    }
-    .tool-list button{
-      background:#fff;
-      border:1px solid var(--line);
-      text-align:left;
-      padding:17px 14px;
-      cursor:pointer;
-      color:var(--main);
-      font-weight:800;
-    }
-    .tool-list span{
-      display:block;
-      color:#777;
-      font-size:12px;
-      font-weight:400;
-      margin-top:6px;
-    }
-
-    .sample-list{
-      width:100%;
-      height:240px;
-      overflow:auto;
-      border:1px solid var(--line);
-      border-radius:8px;
-      padding:8px;
-      background:#fff;
-    }
-    .sample-item{
-      padding:9px 10px;
-      border-radius:6px;
-      cursor:pointer;
-      font-size:14px;
-      line-height:1.35;
-      user-select:none;
-      margin-bottom:4px;
-      border:1px solid transparent;
-    }
-    .sample-item:hover{
-      background:#fff6f9;
-      color:var(--main);
-    }
-    .sample-item.selected{
-      background:var(--soft);
-      color:var(--main);
-      border-color:#edc6d5;
-      font-weight:800;
-    }
-
-    footer{
-      text-align:center;
-      color:#888;
-      font-size:13px;
-      margin-top:16px;
-    }
-
-    @media(max-width:1350px){
-      .app{grid-template-columns:1fr}
-      aside,.right{display:none}
-      main{padding:30px 18px}
-      .file-row,.scale-grid,.sample-layout,.plot-grid{grid-template-columns:1fr}
-      .file-label,.file-name{border:1px solid var(--line);border-radius:7px}
-      .plot{height:480px}
-    }
+    .download{width:100%;padding:14px;border:0;border-radius:7px;background:linear-gradient(180deg,var(--main),var(--main-dark));color:#fff;font-weight:800;cursor:pointer;margin-top:8px}
+    .debug{white-space:pre-wrap;color:#777;font-size:12px;line-height:1.45;margin-top:10px;max-height:170px;overflow:auto}
+    footer{text-align:center;color:#888;font-size:13px;margin-top:16px}
+    @media(max-width:1250px){.app{grid-template-columns:1fr} aside,.right{display:none} main{padding:30px 18px}.file-row,.scale-grid,.sample-layout{grid-template-columns:1fr}.file-label,.file-name{border:1px solid var(--line);border-radius:7px}#plot1{height:520px}}
   </style>
 </head>
 
@@ -402,17 +72,14 @@
   <aside>
     <div class="brand">
       <h2>OLED Data Analysis</h2>
-      <p>Analyze OLED measurement data</p>
+      <p>Analyze paired R / X impedance data</p>
     </div>
-
     <nav>
       <a href="index.html"><span class="nav-icon">⌂</span>Home</a>
       <a href="optical-electrical.html"><span class="nav-icon">▤</span>Optical / Electrical</a>
       <a href="capacitance.html"><span class="nav-icon">╂</span>Capacitance</a>
       <a class="active" href="impedance.html"><span class="nav-icon">⌁</span>Impedance</a>
-      <a href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
     </nav>
-
     <button class="upload-side" onclick="pickFile()">⇧ Upload ZIP File</button>
   </aside>
 
@@ -420,7 +87,7 @@
     <div class="header">
       <div>
         <h1>Impedance Analysis</h1>
-        <p class="subtitle">Analyze Nyquist plot from paired R / X CSV files in ZIP archive</p>
+        <p class="subtitle">ZIP 내부 폴더까지 포함하여 <b>*_R.CSV / *_X.CSV</b> 쌍을 자동 인식합니다.</p>
       </div>
     </div>
 
@@ -437,11 +104,9 @@
       <button onclick="exportExcel()">Export Data</button>
     </div>
 
-    <section class="plot-grid" style="grid-template-columns:1fr;">
-      <div class="plot-card">
-        <h3>Nyquist Plot</h3>
-        <div id="plot1" class="plot" style="height:620px;"></div>
-      </div>
+    <section class="plot-card">
+      <h3>Nyquist Plot</h3>
+      <div id="plot1"></div>
     </section>
 
     <section class="control-card">
@@ -449,17 +114,11 @@
         <strong>스케일 수동 조절</strong>
         <button class="reset" onclick="resetScale()">Reset</button>
       </div>
-
-      <div class="scale-grid" style="grid-template-columns:1fr;">
-        <div class="scale-box">
-          <h4>Nyquist Plot</h4>
-          <div class="input-grid">
-            <label>Z' Min</label><input id="g1xmin" placeholder="Auto" oninput="drawPlots()">
-            <label>Z' Max</label><input id="g1xmax" placeholder="Auto" oninput="drawPlots()">
-            <label>|Z''| Min</label><input id="g1ymin" placeholder="Auto" oninput="drawPlots()">
-            <label>|Z''| Max</label><input id="g1ymax" placeholder="Auto" oninput="drawPlots()">
-          </div>
-        </div>
+      <div class="scale-grid">
+        <div><label>Z' 최소</label><input id="xmin" placeholder="Auto" oninput="drawPlots()"></div>
+        <div><label>Z' 최대</label><input id="xmax" placeholder="Auto" oninput="drawPlots()"></div>
+        <div><label>|Z''| 최소</label><input id="ymin" placeholder="Auto" oninput="drawPlots()"></div>
+        <div><label>|Z''| 최대</label><input id="ymax" placeholder="Auto" oninput="drawPlots()"></div>
       </div>
     </section>
 
@@ -483,370 +142,297 @@
     <div class="side-card">
       <h3>▣ Analysis Summary</h3>
       <div class="summary-row"><strong>File Name</strong><span id="sumFile">-</span></div>
+      <div class="summary-row"><strong>CSV Files</strong><span id="sumCsv">0</span></div>
       <div class="summary-row"><strong>Samples</strong><span id="sumSamples">0</span></div>
       <div class="summary-row"><strong>Data Points</strong><span id="sumPoints">0</span></div>
       <div class="summary-row"><strong>Status</strong><span id="sumStatus">Waiting</span></div>
       <button class="download" onclick="exportExcel()">⇩ Download Report</button>
-    </div>
-
-    <div class="side-card">
-      <h3>Analysis Tools</h3>
-      <div class="tool-list">
-        <button onclick="drawPlots()">Refresh Plot<span>Redraw selected impedance data</span></button>
-        <button onclick="resetScale()">Auto Scale<span>Reset axis limits</span></button>
-        <button onclick="exportExcel()">Export Data<span>Export selected data as Excel</span></button>
-      </div>
+      <div id="debugBox" class="debug"></div>
     </div>
   </section>
 </div>
 
 <script>
-  const colors = ['#000000', '#00A852', '#E41A1C', '#377EB8', '#984EA3', '#FF7F00', '#A65628', '#F781BF'];
-  const markers = ['triangle-up','circle','square','diamond','triangle-down','pentagon','star','hexagon'];
+const colors = ['#000000', '#E41A1C', '#377EB8', '#4DAF4A', '#984EA3', '#FF7F00', '#A65628', '#F781BF'];
+const markers = ['circle','square','triangle-up','diamond','triangle-down','pentagon','star','hexagon'];
 
-  let masterData = {};
-  let sampleOrder = [];
-  let selectedSamples = [];
-  let focusedSample = null;
+let masterData = {};
+let sampleOrder = [];
+let selectedSamples = [];
+let focusedSample = null;
 
-  const fileInput = document.getElementById('fileInput');
-  fileInput.addEventListener('change', handleZipUpload);
+document.getElementById('fileInput').addEventListener('change', handleZipUpload);
 
-  function pickFile(){ fileInput.click(); }
+function pickFile(){ document.getElementById('fileInput').click(); }
 
-  function toNum(v){
-    if(v === null || v === undefined || v === '') return NaN;
-    const s = String(v).replaceAll(',', '').trim();
-    const n = Number(s);
-    return Number.isFinite(n) ? n : NaN;
-  }
-
-  function decodeText(arrayBuffer){
-    const encodings = ['utf-8', 'euc-kr', 'windows-949', 'latin1'];
-    for(const enc of encodings){
-      try{
-        return new TextDecoder(enc, {fatal:false}).decode(arrayBuffer);
-      }catch(e){}
-    }
-    return new TextDecoder('utf-8', {fatal:false}).decode(arrayBuffer);
-  }
-
-  function parseCsvAfterSkipRows(arrayBuffer, skipRows=3){
-    const text = decodeText(arrayBuffer);
-    const lines = text.split(/\r?\n/).slice(skipRows);
-    const col0 = [];
-    const col1 = [];
-
-    for(const line of lines){
-      const s = line.trim();
-      if(!s || s.startsWith('#')) continue;
-
-      const parts = s.includes(',') ? s.split(',').map(v=>v.trim()) : s.split(/[\t ]+/).map(v=>v.trim());
-      if(parts.length < 2) continue;
-
-      const x = toNum(parts[0]);
-      const y = toNum(parts[1]);
-      if(Number.isFinite(x) && Number.isFinite(y)){
-        col0.push(x);
-        col1.push(y);
-      }
-    }
-
-    if(col0.length < 3) return null;
-    return { col0, col1 };
-  }
-
-  function getBaseName(path){
-    return path.split('/').pop().split('\\').pop();
-  }
-
-  function getDirName(path){
-    const idx1 = path.lastIndexOf('/');
-    const idx2 = path.lastIndexOf('\\');
-    const idx = Math.max(idx1, idx2);
-    return idx >= 0 ? path.slice(0, idx) : '';
-  }
-
-  function makeSampleId(path){
-    const dirName = getDirName(path);
-    const baseName = getBaseName(path);
-    const dotRemoved = baseName.replace(/\.csv$/i, '');
-
-    if(!dotRemoved.includes('_')) return null;
-
-    const cut = dotRemoved.lastIndexOf('_');
-    const prefix = dotRemoved.slice(0, cut);
-    const suffix = dotRemoved.slice(cut + 1).toUpperCase();
-
-    let fullSampleId = (dirName ? dirName + '/' : '') + prefix;
-    fullSampleId = fullSampleId.replaceAll('/', '_').replaceAll('\\', '_');
-    if(fullSampleId.startsWith('_')) fullSampleId = fullSampleId.slice(1);
-
-    return { sampleId: fullSampleId, suffix };
-  }
-
-  async function handleZipUpload(event){
-    const file = event.target.files[0];
-    if(!file) return;
-
-    document.getElementById('selectedFile').textContent = file.name;
-    document.getElementById('sumFile').textContent = file.name;
-    document.getElementById('sumStatus').textContent = 'Analyzing...';
-
-    masterData = {};
-    sampleOrder = [];
-    selectedSamples = [];
-    focusedSample = null;
-
+function getBaseName(path){
+  return path.split('/').pop().split('\\').pop();
+}
+function getDirName(path){
+  const i = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
+  return i >= 0 ? path.slice(0, i) : '';
+}
+function normalizeZipPath(path){
+  // ZIP 최상위 폴더가 하나만 있을 때도 샘플명은 폴더/파일 기준으로 유지
+  return path.replaceAll('\\','/');
+}
+function toNum(v){
+  if(v === null || v === undefined) return NaN;
+  const s = String(v).replace(/"/g,'').replace(/,/g,'').trim();
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+function decodeText(buffer){
+  for(const enc of ['utf-8','euc-kr','windows-949','latin1']){
     try{
-      const zip = await JSZip.loadAsync(file);
-      const csvEntries = Object.values(zip.files).filter(f=>{
-        const n = f.name.toLowerCase();
-        const base = getBaseName(n);
-        return !f.dir && n.endsWith('.csv') && !base.startsWith('~$') && !n.includes('__macosx');
-      });
+      return new TextDecoder(enc, {fatal:false}).decode(buffer);
+    }catch(e){}
+  }
+  return new TextDecoder('utf-8').decode(buffer);
+}
+function parseCsvAfterHeader(buffer){
+  const text = decodeText(buffer);
+  const lines = text.split(/\r?\n/);
+  const freq = [];
+  const val = [];
 
-      const fileGroups = {};
+  for(const line of lines){
+    const s = line.trim();
+    if(!s || s.startsWith('#')) continue;
 
-      for(const entry of csvEntries){
-        const info = makeSampleId(entry.name);
-        if(!info) continue;
+    const parts = s.includes(',') ? s.split(',').map(x=>x.trim()) : s.split(/[\t ]+/).map(x=>x.trim());
+    if(parts.length < 2) continue;
 
-        if(!fileGroups[info.sampleId]) fileGroups[info.sampleId] = {};
-        fileGroups[info.sampleId][info.suffix] = entry;
-      }
-
-      const sampleIds = Object.keys(fileGroups).sort();
-
-      for(const sampleId of sampleIds){
-        const group = fileGroups[sampleId];
-
-        if(!group.R || !group.X) continue;
-
-        try{
-          const rBuf = await group.R.async('arraybuffer');
-          const xBuf = await group.X.async('arraybuffer');
-
-          const rData = parseCsvAfterSkipRows(rBuf, 3);
-          const xData = parseCsvAfterSkipRows(xBuf, 3);
-
-          if(!rData || !xData) continue;
-
-          const n = Math.min(rData.col0.length, rData.col1.length, xData.col1.length);
-          if(n < 3) continue;
-
-          masterData[sampleId] = {
-            Freq: rData.col0.slice(0, n),
-            Z_real: rData.col1.slice(0, n),
-            Z_imag_abs: xData.col1.slice(0, n).map(v => Math.abs(v)),
-            fileR: group.R.name,
-            fileX: group.X.name
-          };
-          sampleOrder.push(sampleId);
-        }catch(e){
-          console.warn('skip sample:', sampleId, e);
-        }
-      }
-
-      if(sampleOrder.length === 0){
-        document.getElementById('sumStatus').textContent = 'No valid R/X CSV pair';
-        alert("인식 실패: ZIP 안에 같은 접두사를 가진 *_R.csv 와 *_X.csv 쌍이 있는지 확인해주세요. 예: Sample1_R.csv / Sample1_X.csv");
-        return;
-      }
-
-      selectedSamples = [...sampleOrder];
-      focusedSample = selectedSamples[0] || null;
-      updateSampleSelect();
-      updateSummary();
-      drawPlots();
-      document.getElementById('sumStatus').innerHTML = '<span class="ok">● Analysis Complete</span>';
-
-    }catch(e){
-      document.getElementById('sumStatus').textContent = 'Error';
-      alert('ZIP 분석 실패: ' + e.message);
+    const x = toNum(parts[0]);
+    const y = toNum(parts[1]);
+    if(Number.isFinite(x) && Number.isFinite(y)){
+      freq.push(x);
+      val.push(y);
     }
   }
+  if(freq.length < 3) return null;
+  return {freq, val};
+}
 
-  function updateSummary(){
-    document.getElementById('sumSamples').textContent = sampleOrder.length;
-    let points = 0;
-    for(const s of sampleOrder) points += masterData[s]?.Freq?.length || 0;
-    document.getElementById('sumPoints').textContent = points.toLocaleString();
-  }
+function parsePairInfo(path){
+  const p = normalizeZipPath(path);
+  const dir = getDirName(p);
+  const base = getBaseName(p).replace(/\.csv$/i,'');
 
-  function updateSampleSelect(){
-    const box = document.getElementById('sampleList');
-    if(!box) return;
-    box.innerHTML = '';
-    sampleOrder.forEach(s=>{
-      const item = document.createElement('div');
-      item.className = 'sample-item' + (selectedSamples.includes(s) ? ' selected' : '');
-      item.textContent = s;
-      item.title = s;
-      item.onclick = () => toggleSample(s);
-      box.appendChild(item);
+  const match = base.match(/^(.*)_([RX])$/i);
+  if(!match) return null;
+
+  const prefix = match[1];
+  const suffix = match[2].toUpperCase();
+
+  // Python 코드와 동일하게 폴더 경로 + prefix를 샘플 ID로 사용
+  let sampleId = (dir ? dir + '/' : '') + prefix;
+  sampleId = sampleId.replaceAll('/','_').replaceAll('\\','_');
+  if(sampleId.startsWith('_')) sampleId = sampleId.slice(1);
+
+  return {sampleId, suffix};
+}
+
+async function handleZipUpload(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  document.getElementById('selectedFile').textContent = file.name;
+  document.getElementById('sumFile').textContent = file.name;
+  document.getElementById('sumStatus').textContent = 'Analyzing...';
+  document.getElementById('debugBox').textContent = '';
+
+  masterData = {};
+  sampleOrder = [];
+  selectedSamples = [];
+  focusedSample = null;
+
+  try{
+    const zip = await JSZip.loadAsync(file);
+    const csvEntries = Object.values(zip.files).filter(f=>{
+      const n = normalizeZipPath(f.name).toLowerCase();
+      const b = getBaseName(n);
+      return !f.dir && n.endsWith('.csv') && !b.startsWith('~$') && !n.includes('__macosx');
     });
-  }
 
-  function toggleSample(name){
-    focusedSample = name;
-    if(selectedSamples.includes(name)){
-      selectedSamples = selectedSamples.filter(s => s !== name);
-    }else{
-      selectedSamples.push(name);
-      selectedSamples.sort((a,b)=>sampleOrder.indexOf(a)-sampleOrder.indexOf(b));
+    document.getElementById('sumCsv').textContent = csvEntries.length;
+
+    const groups = {};
+    const skipped = [];
+
+    for(const entry of csvEntries){
+      const info = parsePairInfo(entry.name);
+      if(!info){
+        skipped.push(entry.name);
+        continue;
+      }
+      if(!groups[info.sampleId]) groups[info.sampleId] = {};
+      groups[info.sampleId][info.suffix] = entry;
     }
-    updateSampleSelect();
-    drawPlots();
-  }
 
-  function selectAllSamples(){
+    const groupNames = Object.keys(groups).sort((a,b)=>a.localeCompare(b, undefined, {numeric:true}));
+
+    for(const sampleId of groupNames){
+      const g = groups[sampleId];
+      if(!g.R || !g.X) continue;
+
+      const rData = parseCsvAfterHeader(await g.R.async('arraybuffer'));
+      const xData = parseCsvAfterHeader(await g.X.async('arraybuffer'));
+      if(!rData || !xData) continue;
+
+      const n = Math.min(rData.freq.length, rData.val.length, xData.val.length);
+      if(n < 3) continue;
+
+      masterData[sampleId] = {
+        Freq: rData.freq.slice(0,n),
+        Z_real: rData.val.slice(0,n),
+        Z_imag_abs: xData.val.slice(0,n).map(v=>Math.abs(v)),
+        fileR: g.R.name,
+        fileX: g.X.name
+      };
+      sampleOrder.push(sampleId);
+    }
+
+    if(sampleOrder.length === 0){
+      document.getElementById('sumStatus').textContent = 'No valid R/X CSV pair';
+      const groupPreview = groupNames.slice(0,20).join('\n');
+      const csvPreview = csvEntries.slice(0,20).map(e=>e.name).join('\n');
+      document.getElementById('debugBox').textContent =
+        `CSV ${csvEntries.length}개 발견\\n그룹 ${groupNames.length}개 발견\\n\\n[CSV 예시]\\n${csvPreview}\\n\\n[그룹 예시]\\n${groupPreview}`;
+      alert("인식 실패: *_R.CSV / *_X.CSV 쌍 또는 CSV 숫자 데이터를 확인해주세요. 오른쪽 Debug에 감지된 파일명이 표시됩니다.");
+      return;
+    }
+
     selectedSamples = [...sampleOrder];
     focusedSample = selectedSamples[0] || null;
     updateSampleSelect();
+    updateSummary();
     drawPlots();
+
+    document.getElementById('sumStatus').innerHTML = '<span class="ok">● Analysis Complete</span>';
+    document.getElementById('debugBox').textContent =
+      `인식 완료: CSV ${csvEntries.length}개, 샘플 ${sampleOrder.length}개\\n` +
+      sampleOrder.slice(0,20).join('\n');
+
+  }catch(e){
+    document.getElementById('sumStatus').textContent = 'Error';
+    document.getElementById('debugBox').textContent = e.stack || e.message;
+    alert('ZIP 분석 실패: ' + e.message);
   }
+}
 
-  function moveSample(direction){
-    const name = focusedSample || (selectedSamples.length === 1 ? selectedSamples[0] : null);
-    if(!name){
-      alert('정렬할 샘플을 하나 클릭해주세요.');
-      return;
-    }
-
-    const idx = sampleOrder.indexOf(name);
-    const newIdx = idx + direction;
-    if(newIdx < 0 || newIdx >= sampleOrder.length) return;
-
-    [sampleOrder[idx], sampleOrder[newIdx]] = [sampleOrder[newIdx], sampleOrder[idx]];
-    selectedSamples = selectedSamples.sort((a,b)=>sampleOrder.indexOf(a)-sampleOrder.indexOf(b));
-    updateSampleSelect();
-    drawPlots();
+function updateSummary(){
+  document.getElementById('sumSamples').textContent = sampleOrder.length;
+  let points = 0;
+  for(const s of sampleOrder) points += masterData[s]?.Freq?.length || 0;
+  document.getElementById('sumPoints').textContent = points.toLocaleString();
+}
+function updateSampleSelect(){
+  const box = document.getElementById('sampleList');
+  box.innerHTML = '';
+  sampleOrder.forEach(s=>{
+    const item = document.createElement('div');
+    item.className = 'sample-item' + (selectedSamples.includes(s) ? ' selected' : '');
+    item.textContent = s;
+    item.title = s;
+    item.onclick = () => toggleSample(s);
+    box.appendChild(item);
+  });
+}
+function toggleSample(name){
+  focusedSample = name;
+  if(selectedSamples.includes(name)){
+    selectedSamples = selectedSamples.filter(s=>s!==name);
+  }else{
+    selectedSamples.push(name);
+    selectedSamples.sort((a,b)=>sampleOrder.indexOf(a)-sampleOrder.indexOf(b));
   }
+  updateSampleSelect();
+  drawPlots();
+}
+function selectAllSamples(){
+  selectedSamples = [...sampleOrder];
+  focusedSample = selectedSamples[0] || null;
+  updateSampleSelect();
+  drawPlots();
+}
+function moveSample(direction){
+  const name = focusedSample || (selectedSamples.length === 1 ? selectedSamples[0] : null);
+  if(!name){ alert('정렬할 샘플을 하나 클릭해주세요.'); return; }
+  const idx = sampleOrder.indexOf(name);
+  const ni = idx + direction;
+  if(ni < 0 || ni >= sampleOrder.length) return;
+  [sampleOrder[idx], sampleOrder[ni]] = [sampleOrder[ni], sampleOrder[idx]];
+  selectedSamples.sort((a,b)=>sampleOrder.indexOf(a)-sampleOrder.indexOf(b));
+  updateSampleSelect();
+  drawPlots();
+}
+function getNumber(id){
+  const v = document.getElementById(id).value.trim();
+  if(v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function drawPlots(){
+  const selected = selectedSamples.filter(s=>masterData[s]);
+  if(!selected.length){ Plotly.purge('plot1'); return; }
 
-  function getNumber(id){
-    const v = document.getElementById(id).value.trim();
-    if(v === '') return null;
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  }
+  const traces = selected.map((s,i)=>({
+    x: masterData[s].Z_real,
+    y: masterData[s].Z_imag_abs,
+    name: s,
+    mode:'lines+markers',
+    line:{width:2.5,color:colors[i%colors.length]},
+    marker:{symbol:markers[i%markers.length],size:8,color:'white',line:{color:colors[i%colors.length],width:1.8}},
+    connectgaps:false
+  }));
 
-  function axisRange(minId, maxId){
-    const min = getNumber(minId);
-    const max = getNumber(maxId);
-    return (min !== null || max !== null) ? [min, max] : undefined;
-  }
+  const layout = {
+    margin:{l:90,r:40,t:18,b:75},
+    paper_bgcolor:'#fff',
+    plot_bgcolor:'#fff',
+    font:{family:'Arial, Noto Sans KR, sans-serif',size:13},
+    xaxis:{title:{text:"Z' (Ω)",font:{size:20}},showgrid:true,gridcolor:'#e9e9e9',zeroline:false,linecolor:'#333',mirror:true,ticks:'inside',scaleanchor:'y',scaleratio:1},
+    yaxis:{title:{text:"|Z''| (Ω)",font:{size:20}},showgrid:true,gridcolor:'#e9e9e9',zeroline:false,linecolor:'#333',mirror:true,ticks:'inside'},
+    legend:{x:1.02,y:1,font:{size:11},bgcolor:'rgba(255,255,255,0)'}
+  };
 
-  function applyRange(layout, axisName, minId, maxId){
-    const r = axisRange(minId, maxId);
-    if(r) layout[axisName] = {...(layout[axisName] || {}), range:r};
-  }
+  const xmin=getNumber('xmin'), xmax=getNumber('xmax'), ymin=getNumber('ymin'), ymax=getNumber('ymax');
+  if(xmin!==null || xmax!==null) layout.xaxis.range=[xmin,xmax];
+  if(ymin!==null || ymax!==null) layout.yaxis.range=[ymin,ymax];
 
-  function makeTrace(x,y,name,i){
-    return {
-      x, y, name,
-      mode:'lines+markers',
-      line:{width:2.5, color:colors[i % colors.length]},
-      marker:{
-        symbol:markers[i % markers.length],
-        size:8,
-        color:'white',
-        line:{color:colors[i % colors.length], width:1.8}
-      },
-      connectgaps:false
-    };
-  }
+  Plotly.react('plot1', traces, layout, {responsive:true, displayModeBar:true});
+}
+function resetScale(){
+  ['xmin','xmax','ymin','ymax'].forEach(id=>document.getElementById(id).value='');
+  drawPlots();
+}
+function sheetFromColumns(columns){
+  const maxLen = Math.max(...columns.map(c=>c.data.length));
+  const aoa = [columns.map(c=>c.name)];
+  for(let i=0;i<maxLen;i++) aoa.push(columns.map(c=>c.data[i] ?? null));
+  return XLSX.utils.aoa_to_sheet(aoa);
+}
+function exportExcel(){
+  const ordered = selectedSamples.filter(s=>masterData[s]);
+  if(!ordered.length){ alert('추출할 샘플을 선택해주세요.'); return; }
 
-  function drawPlots(){
-    const selected = selectedSamples.filter(s=>masterData[s]);
-    if(selected.length === 0){
-      Plotly.purge('plot1');
-      return;
-    }
+  const wb = XLSX.utils.book_new();
+  const cols = [];
+  const meta = [['sample','R_file','X_file','note']];
 
-    const traces = selected.map((s,i)=>{
-      const d = masterData[s];
-      return makeTrace(d.Z_real, d.Z_imag_abs, s, i);
-    });
+  ordered.forEach(s=>{
+    const d = masterData[s];
+    cols.push({name:`${s}_Freq`,data:d.Freq});
+    cols.push({name:`${s}_Z_real`,data:d.Z_real});
+    cols.push({name:`${s}_|Z_imag|`,data:d.Z_imag_abs});
+    meta.push([s,d.fileR,d.fileX,"Z_real: *_R.CSV 2nd col, |Z_imag|: abs(*_X.CSV 2nd col)"]);
+  });
 
-    const layout = {
-      margin:{l:90,r:40,t:18,b:75},
-      paper_bgcolor:'#ffffff',
-      plot_bgcolor:'#ffffff',
-      font:{family:'Arial, Noto Sans KR, sans-serif', size:13},
-      xaxis:{
-        title:{text:"Z' (Ω)", font:{size:20}},
-        showgrid:true,
-        gridcolor:'#e9e9e9',
-        zeroline:false,
-        linecolor:'#333',
-        linewidth:1.5,
-        mirror:true,
-        ticks:'inside',
-        scaleanchor:'y',
-        scaleratio:1
-      },
-      yaxis:{
-        title:{text:"|Z''| (Ω)", font:{size:20}},
-        showgrid:true,
-        gridcolor:'#e9e9e9',
-        zeroline:false,
-        linecolor:'#333',
-        linewidth:1.5,
-        mirror:true,
-        ticks:'inside'
-      },
-      legend:{
-        x:1.02,
-        y:1,
-        font:{size:11},
-        bgcolor:'rgba(255,255,255,0)'
-      }
-    };
-
-    applyRange(layout, 'xaxis', 'g1xmin', 'g1xmax');
-    applyRange(layout, 'yaxis', 'g1ymin', 'g1ymax');
-
-    Plotly.react('plot1', traces, layout, {responsive:true, displayModeBar:true});
-  }
-
-  function resetScale(){
-    ['g1xmin','g1xmax','g1ymin','g1ymax'].forEach(id=>document.getElementById(id).value='');
-    drawPlots();
-  }
-
-  function sheetFromColumns(columns){
-    const maxLen = Math.max(...columns.map(c=>c.data.length));
-    const aoa = [columns.map(c=>c.name)];
-    for(let i=0; i<maxLen; i++){
-      aoa.push(columns.map(c=>c.data[i] ?? null));
-    }
-    return XLSX.utils.aoa_to_sheet(aoa);
-  }
-
-  function exportExcel(){
-    const ordered = selectedSamples.filter(s=>masterData[s]);
-    if(ordered.length === 0){
-      alert('추출할 샘플을 선택해주세요.');
-      return;
-    }
-
-    const wb = XLSX.utils.book_new();
-    const cols = [];
-    const meta = [['sample','R_file','X_file','note']];
-
-    ordered.forEach(s=>{
-      const d = masterData[s];
-      cols.push({name:`${s}_Freq`, data:d.Freq});
-      cols.push({name:`${s}_Z_real`, data:d.Z_real});
-      cols.push({name:`${s}_|Z_imag|`, data:d.Z_imag_abs});
-      meta.push([s, d.fileR, d.fileX, "Z_real from *_R.csv second column, |Z_imag| from *_X.csv second column after skiprows=3"]);
-    });
-
-    XLSX.utils.book_append_sheet(wb, sheetFromColumns(cols), 'Data');
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(meta), 'Meta');
-    XLSX.writeFile(wb, 'Impedance_Analysis_Report.xlsx');
-  }
+  XLSX.utils.book_append_sheet(wb, sheetFromColumns(cols), 'Data');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(meta), 'Meta');
+  XLSX.writeFile(wb, 'Impedance_Analysis_Report.xlsx');
+}
 </script>
 </body>
 </html>
