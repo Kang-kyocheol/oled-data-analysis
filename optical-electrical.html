@@ -360,6 +360,61 @@
       border-color: var(--main);
     }
 
+
+    .global-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px 10px;
+      margin: 0 0 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #333;
+      white-space: nowrap;
+    }
+
+    .legend-symbol {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      background: #fff;
+      display: inline-block;
+    }
+
+    .figure-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .figure-buttons button {
+      border: 1px solid var(--main);
+      background: #fff;
+      color: var(--main);
+      border-radius: 7px;
+      padding: 11px 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .figure-buttons button.all {
+      background: var(--main);
+      color: #fff;
+    }
+
     .bottom-tools {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -556,8 +611,8 @@
       <button>⌂ &nbsp; Dashboard</button>
       <button onclick="pickFile()">⇧ &nbsp; Upload Data</button>
       <button class="active">▦ &nbsp; OLED Analysis</button>
-      <button onclick="alert('Capacitance 분석 페이지는 추후 연결')">≋ &nbsp; Capacitance Analysis</button>
-      <button onclick="alert('Impedance 분석 페이지는 추후 연결')">⌁ &nbsp; Impedance Analysis</button>
+      <button onclick="location.href='capacitance.html'">≋ &nbsp; Capacitance Analysis</button>
+      <button onclick="location.href='impedance.html'">⌁ &nbsp; Impedance Analysis</button>
       <button>▤ &nbsp; Results</button>
       <button>▧ &nbsp; Reports</button>
       <button>⚙ &nbsp; Settings</button>
@@ -592,6 +647,7 @@
       <button>Power Efficiency</button>
       <button>Luminance</button>
       <button onclick="selectAllSamples()">Select All</button>
+      <button onclick="clearAllSamples()">Clear All</button>
     </div>
 
 
@@ -603,10 +659,19 @@
           <button onclick="moveSample(-1)">▲ 위로 이동</button>
           <button onclick="moveSample(1)">▼ 아래로 이동</button>
           <button onclick="selectAllSamples()">전체 선택</button>
+          <button onclick="clearAllSamples()">전체 해제</button>
           <button class="export" onclick="exportExcel()">데이터 추출</button>
         </div>
       </div>
     </section>
+
+
+    <div class="figure-buttons">
+      <button onclick="savePlot('plot1', 'OLED_JVL.png')">J–V–L 그림 저장</button>
+      <button onclick="savePlot('plot2', 'OLED_CEPE.png')">CE/PE 그림 저장</button>
+      <button onclick="savePlot('plot3', 'OLED_EQE.png')">EQE 그림 저장</button>
+      <button class="all" onclick="saveAllPlots()">전체 그림 저장</button>
+    </div>
 
     <div class="chart-grid">
       <div class="card">
@@ -615,6 +680,9 @@
       </div>
       <div class="card">
         <h3>Luminance – Current Density</h3>
+        <div id="globalLegend" class="global-legend">
+          <span style="color:#777;font-weight:600;">No sample selected</span>
+        </div>
         <div id="plot2" class="plot"></div>
       </div>
       <div class="card">
@@ -680,7 +748,7 @@
         <div>
           <h3>Capacitance Data Analysis</h3>
           <p>Analyze capacitance–frequency characteristics and extract key parameters.</p>
-          <button class="outline" onclick="alert('Capacitance 분석 기능 연결 예정')">Capacitance Analysis</button>
+          <button class="outline" onclick="location.href='capacitance.html'">Capacitance Analysis</button>
         </div>
       </div>
 
@@ -689,7 +757,7 @@
         <div>
           <h3>Impedance Data Analysis</h3>
           <p>Analyze impedance data and extract equivalent circuit parameters.</p>
-          <button class="outline" onclick="alert('Impedance 분석 기능 연결 예정')">Impedance Analysis</button>
+          <button class="outline" onclick="location.href='impedance.html'">Impedance Analysis</button>
         </div>
       </div>
     </div>
@@ -880,10 +948,11 @@
     if (r) layout[axisName] = { ...(layout[axisName] || {}), range: r };
   }
 
-  function makeTrace(x, y, name, i, yaxis='y', mode='lines+markers') {
+  function makeTrace(x, y, name, i, yaxis='y', mode='lines+markers', showlegend=false) {
     return {
       x, y, name, mode,
       yaxis,
+      showlegend,
       line: { width: 2, color: colors[i % colors.length] },
       marker: {
         symbol: markers[i % markers.length],
@@ -919,13 +988,60 @@
         mirror: true,
         ticks: 'inside'
       },
+      showlegend: false,
       legend: {
-        x: 1.02,
-        y: 1,
-        font: { size: 9 },
+        x: 0.5,
+        y: 1.12,
+        xanchor: 'center',
+        orientation: 'h',
+        font: { size: 11 },
         bgcolor: 'rgba(255,255,255,0)'
       }
     };
+  }
+
+
+  function updateGlobalLegend() {
+    const box = document.getElementById('globalLegend');
+    if (!box) return;
+
+    const selected = selectedSamples.filter(s => masterData[s]);
+    updateGlobalLegend();
+    if (!selected.length) {
+      box.innerHTML = '<span style="color:#777;font-weight:600;">No sample selected</span>';
+      return;
+    }
+
+    box.innerHTML = selected.map((s, i) => {
+      const c = colors[i % colors.length];
+      return `
+        <span class="legend-item" title="${s}">
+          <span class="legend-symbol" style="color:${c}"></span>
+          ${s}
+        </span>`;
+    }).join('');
+  }
+
+  function savePlot(plotId, filename) {
+    const el = document.getElementById(plotId);
+    if (!el || !el.data || !el.data.length) {
+      alert('저장할 그래프가 없습니다.');
+      return;
+    }
+
+    Plotly.downloadImage(el, {
+      format: 'png',
+      filename: filename.replace(/\.png$/i, ''),
+      width: 1200,
+      height: 900,
+      scale: 3
+    });
+  }
+
+  function saveAllPlots() {
+    savePlot('plot1', 'OLED_JVL.png');
+    setTimeout(() => savePlot('plot2', 'OLED_CEPE.png'), 500);
+    setTimeout(() => savePlot('plot3', 'OLED_EQE.png'), 1000);
   }
 
   function drawPlots() {
@@ -944,13 +1060,13 @@
 
     selected.forEach((s, i) => {
       const d = masterData[s];
-      traces1.push(makeTrace(d.V, d.J, s + ' J', i));
-      traces1.push(makeTrace(d.V, d.L, s + ' L', i, 'y2'));
+      traces1.push(makeTrace(d.V, d.J, s, i, 'y', 'lines+markers', false));
+      traces1.push(makeTrace(d.V, d.L, s, i, 'y2', 'lines+markers', false));
 
-      traces2.push(makeTrace(d.L, d.CE, s + ' CE', i));
-      traces2.push(makeTrace(d.L, d.PE, s + ' PE', i, 'y2'));
+      traces2.push(makeTrace(d.L, d.CE, s, i, 'y', 'lines+markers', false));
+      traces2.push(makeTrace(d.L, d.PE, s, i, 'y2', 'lines+markers', false));
 
-      traces3.push(makeTrace(d.J, d.EQE, s, i));
+      traces3.push(makeTrace(d.J, d.EQE, s, i, 'y', 'lines+markers', false));
     });
 
     const layout1 = baseLayout('Voltage (V)', 'Current Density (mA/cm²)');
@@ -987,7 +1103,7 @@
     applyRange(layout3, 'xaxis', 'g3xmin', 'g3xmax');
     applyRange(layout3, 'yaxis', 'g3ymin', 'g3ymax');
 
-    const config = { responsive: true, displayModeBar: false };
+    const config = { responsive: true, displayModeBar: true };
     Plotly.react('plot1', traces1, layout1, config);
     Plotly.react('plot2', traces2, layout2, config);
     Plotly.react('plot3', traces3, layout3, config);
@@ -1046,6 +1162,15 @@
     selectedSamples = [...sampleOrder];
     focusedSample = selectedSamples[0] || null;
     updateSampleSelect();
+    drawPlots();
+  }
+
+
+  function clearAllSamples() {
+    selectedSamples = [];
+    focusedSample = null;
+    updateSampleSelect();
+    updateGlobalLegend();
     drawPlots();
   }
 
