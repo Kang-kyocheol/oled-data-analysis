@@ -22,7 +22,9 @@
       --card: #ffffff;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -32,20 +34,21 @@
     }
 
     .app {
-      max-width: 1720px;
+      width: calc(100vw - 20px);
+      max-width: none;
       margin: 10px auto;
       background: var(--card);
       border-radius: 18px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
       overflow: hidden;
       display: grid;
-      grid-template-columns: 260px 1fr 300px;
+      grid-template-columns: 240px minmax(0, 1fr);
       min-height: 100vh;
     }
 
     aside {
       border-right: 1px solid var(--line);
-      padding: 34px 28px;
+      padding: 34px 22px;
       background: #fff;
     }
 
@@ -100,6 +103,10 @@
       font-size: 13px;
     }
 
+    .recent-item {
+      word-break: break-all;
+    }
+
     .recent-item span {
       display: block;
       color: var(--muted);
@@ -120,14 +127,15 @@
     }
 
     main {
-      padding: 34px 30px 18px;
+      padding: 28px 38px 20px;
+      min-width: 0;
     }
 
     .head {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
     h1 {
@@ -146,7 +154,7 @@
       display: grid;
       grid-template-columns: 130px 1fr 180px;
       gap: 14px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       align-items: stretch;
     }
 
@@ -166,6 +174,7 @@
       padding: 14px 18px;
       color: #444;
       font-size: 14px;
+      word-break: break-all;
     }
 
     .primary {
@@ -199,30 +208,130 @@
       border-color: var(--main);
     }
 
+    .sample-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 18px;
+      background: #fff;
+    }
+
+    .sample-card h3 {
+      margin: 0 0 12px;
+      color: var(--main);
+      font-size: 17px;
+    }
+
+    .sample-layout {
+      display: grid;
+      grid-template-columns: 1fr 150px;
+      gap: 14px;
+    }
+
+    .sample-list {
+      width: 100%;
+      height: 210px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      background: #fff;
+    }
+
+    .sample-item {
+      padding: 9px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1.35;
+      user-select: none;
+      margin-bottom: 4px;
+      border: 1px solid transparent;
+      word-break: break-all;
+    }
+
+    .sample-item:hover {
+      background: #fff6f9;
+      color: var(--main);
+    }
+
+    .sample-item.selected {
+      background: var(--soft);
+      color: var(--main);
+      border-color: #edc6d5;
+      font-weight: 800;
+    }
+
+    .sample-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sample-buttons button {
+      padding: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 7px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .sample-buttons button.export {
+      background: var(--main);
+      color: #fff;
+      border-color: var(--main);
+    }
+
+    .figure-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .figure-buttons button {
+      border: 1px solid var(--main);
+      background: #fff;
+      color: var(--main);
+      border-radius: 7px;
+      padding: 12px 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .figure-buttons button.all {
+      background: var(--main);
+      color: #fff;
+    }
+
     .chart-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      margin-bottom: 18px;
+      grid-template-columns: 1fr;
+      gap: 34px;
+      margin-bottom: 26px;
     }
 
     .card {
       border: 1px solid var(--line);
-      border-radius: 10px;
+      border-radius: 14px;
       background: #fff;
-      padding: 16px;
+      padding: 24px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.035);
     }
 
     .card h3 {
-      margin: 0 0 10px;
+      margin: 0 0 18px;
       color: var(--main);
       text-align: center;
-      font-size: 15px;
+      font-size: 21px;
+      letter-spacing: -0.3px;
     }
 
     .plot {
       width: 100%;
-      height: 360px;
+      height: 660px;
+      min-height: 600px;
     }
 
     .control-card {
@@ -230,6 +339,7 @@
       border-radius: 10px;
       padding: 16px;
       margin-bottom: 18px;
+      background: #fff;
     }
 
     .control-head {
@@ -239,7 +349,9 @@
       margin-bottom: 12px;
     }
 
-    .control-head strong { color: var(--main); }
+    .control-head strong {
+      color: var(--main);
+    }
 
     .reset {
       background: #fff;
@@ -253,8 +365,8 @@
 
     .scale-grid {
       display: grid;
-      grid-template-columns: 1.3fr 1.3fr 1fr 0.7fr;
-      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
     }
 
     .scale-box {
@@ -285,103 +397,6 @@
       font-size: 12px;
     }
 
-
-    .sample-card {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 18px;
-      background:#fff;
-    }
-
-    .sample-card h3 {
-      margin: 0 0 12px;
-      color: var(--main);
-      font-size: 17px;
-    }
-
-    .sample-layout {
-      display: grid;
-      grid-template-columns: 1fr 150px;
-      gap: 14px;
-    }
-
-    .sample-list{
-      width:100%;
-      height:240px;
-      overflow:auto;
-      border:1px solid var(--line);
-      border-radius:8px;
-      padding:8px;
-      background:#fff;
-    }
-
-    .sample-item{
-      padding:9px 10px;
-      border-radius:6px;
-      cursor:pointer;
-      font-size:14px;
-      line-height:1.35;
-      user-select:none;
-      margin-bottom:4px;
-      border:1px solid transparent;
-    }
-
-    .sample-item:hover{
-      background:#fff6f9;
-      color:var(--main);
-    }
-
-    .sample-item.selected{
-      background:var(--soft);
-      color:var(--main);
-      border-color:#edc6d5;
-      font-weight:800;
-    }
-
-    .sample-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .sample-buttons button {
-      padding: 12px;
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 7px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .sample-buttons button.export {
-      background: var(--main);
-      color: #fff;
-      border-color: var(--main);
-    }
-
-    .figure-buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .figure-buttons button {
-      border: 1px solid var(--main);
-      background: #fff;
-      color: var(--main);
-      border-radius: 7px;
-      padding: 11px 12px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .figure-buttons button.all {
-      background: var(--main);
-      color: #fff;
-    }
-
     .bottom-tools {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -397,6 +412,7 @@
       border: 1px solid var(--line);
       border-radius: 10px;
       padding: 24px;
+      background: #fff;
     }
 
     .tool-card .icon {
@@ -427,7 +443,7 @@
     }
 
     .right {
-      padding: 120px 24px 24px 0;
+      display: none;
     }
 
     .side-card {
@@ -456,7 +472,10 @@
       font-weight: 600;
     }
 
-    .ok { color: #14a83b; font-weight: 800; }
+    .ok {
+      color: #14a83b;
+      font-weight: 800;
+    }
 
     .download {
       width: 100%;
@@ -493,60 +512,8 @@
       margin-top: 6px;
     }
 
-    #fileInput { display: none; }
-
-    .sample-panel {
+    #fileInput {
       display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.25);
-      z-index: 10;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .sample-modal {
-      width: 760px;
-      max-width: calc(100% - 32px);
-      background: #fff;
-      border-radius: 12px;
-      padding: 22px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-    }
-
-    .sample-modal h3 {
-      margin-top: 0;
-      color: var(--main);
-    }
-
-    .sample-body {
-      display: grid;
-      grid-template-columns: 1fr 150px;
-      gap: 16px;
-    }
-
-    select[multiple] {
-      width: 100%;
-      height: 280px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 8px;
-      font-size: 14px;
-    }
-
-    .sample-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .sample-actions button {
-      padding: 12px;
-      border-radius: 6px;
-      border: 1px solid var(--line);
-      background: #fff;
-      cursor: pointer;
-      font-weight: 700;
     }
 
     footer {
@@ -557,11 +524,52 @@
     }
 
     @media (max-width: 1200px) {
-      .app { grid-template-columns: 1fr; }
-      aside, .right { display: none; }
-      .chart-grid, .bottom-tools, .scale-grid { grid-template-columns: 1fr; }
-      .file-row { grid-template-columns: 1fr; }
-      .file-label, .file-name { border-radius: 6px; border: 1px solid var(--line); }
+      .app {
+        grid-template-columns: 1fr;
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+      }
+
+      aside,
+      .right {
+        display: none;
+      }
+
+      main {
+        padding: 22px 16px;
+      }
+
+      .chart-grid,
+      .bottom-tools,
+      .scale-grid,
+      .figure-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .plot {
+        height: 560px;
+        min-height: 520px;
+      }
+
+      .file-row {
+        grid-template-columns: 1fr;
+      }
+
+      .file-label,
+      .file-name {
+        border-radius: 6px;
+        border: 1px solid var(--line);
+      }
+
+      .sample-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sample-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
 </head>
@@ -617,7 +625,6 @@
       <button onclick="clearAllSamples()">Clear All</button>
     </div>
 
-
     <section class="sample-card">
       <h3>샘플 선택 / 정렬</h3>
       <div class="sample-layout">
@@ -632,7 +639,6 @@
       </div>
     </section>
 
-
     <div class="figure-buttons">
       <button onclick="savePlot('plot1', 'OLED_JVL.png')">J–V–L 그림 저장</button>
       <button onclick="savePlot('plot2', 'OLED_CEPE.png')">CE/PE 그림 저장</button>
@@ -643,15 +649,17 @@
     <div class="chart-grid">
       <div class="card">
         <h3>Current Density – Voltage</h3>
-<div id="plot1" class="plot"></div>
+        <div id="plot1" class="plot"></div>
       </div>
+
       <div class="card">
         <h3>Luminance – Current Density</h3>
-<div id="plot2" class="plot"></div>
+        <div id="plot2" class="plot"></div>
       </div>
+
       <div class="card">
         <h3>EQE – Current Density</h3>
-<div id="plot3" class="plot"></div>
+        <div id="plot3" class="plot"></div>
       </div>
     </div>
 
@@ -782,9 +790,11 @@
   function getIdx(cols, keywords) {
     const colsNorm = cols.map(normHeader);
     const keysNorm = keywords.map(normHeader);
+
     for (let i = 0; i < colsNorm.length; i++) {
       if (keysNorm.some(k => colsNorm[i].includes(k))) return i;
     }
+
     return -1;
   }
 
@@ -802,13 +812,23 @@
     return path.replace(/^.*[\\/]/, '').replace(/\.(xls|xlsx)$/i, '');
   }
 
+  function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  }
+
+  function setHTML(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = value;
+  }
+
   async function handleZipUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    document.getElementById('selectedFile').textContent = file.name;
-    document.getElementById('sumFile').textContent = file.name;
-    document.getElementById('sumStatus').innerHTML = 'Analyzing...';
+    setText('selectedFile', file.name);
+    setText('sumFile', file.name);
+    setHTML('sumStatus', 'Analyzing...');
 
     masterData = {};
     sampleOrder = [];
@@ -816,19 +836,32 @@
 
     try {
       const zip = await JSZip.loadAsync(file);
+
       const entries = Object.values(zip.files).filter(f => {
         const n = f.name.toLowerCase();
-        return !f.dir && (n.endsWith('.xls') || n.endsWith('.xlsx')) &&
-          !baseName(f.name).startsWith('~$') && !n.includes('__macosx');
+        return !f.dir &&
+          (n.endsWith('.xls') || n.endsWith('.xlsx')) &&
+          !baseName(f.name).startsWith('~$') &&
+          !n.includes('__macosx');
       });
 
       for (const entry of entries) {
         try {
           const buf = await entry.async('arraybuffer');
           const wb = XLSX.read(buf, { type: 'array' });
-          const targetSheet = wb.SheetNames.find(s => /IVL|JVL|JV/i.test(s)) || wb.SheetNames[0];
+
+          const targetSheet =
+            wb.SheetNames.find(s => /IVL|JVL|JV/i.test(s)) ||
+            wb.SheetNames[0];
+
           const ws = wb.Sheets[targetSheet];
-          const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null });
+
+          const rows = XLSX.utils.sheet_to_json(ws, {
+            header: 1,
+            raw: true,
+            defval: null
+          });
+
           if (rows.length < 2) continue;
 
           const header = rows[0];
@@ -844,12 +877,31 @@
           };
 
           if (Object.values(idx).some(x => x < 0) && header.length >= 15) {
-            idx = { v: 1, j: 3, ce: 4, pe: 5, l: 6, eqe: 14 };
+            idx = {
+              v: 1,
+              j: 3,
+              ce: 4,
+              pe: 5,
+              l: 6,
+              eqe: 14
+            };
           }
 
-          if (idx.v < 0 || idx.j < 0 || idx.l < 0 || idx.ce < 0 || idx.pe < 0 || idx.eqe < 0) continue;
+          if (
+            idx.v < 0 ||
+            idx.j < 0 ||
+            idx.l < 0 ||
+            idx.ce < 0 ||
+            idx.pe < 0 ||
+            idx.eqe < 0
+          ) {
+            continue;
+          }
 
-          const label = entry.name.replace(/\.(xls|xlsx)$/i, '').replaceAll('/', '_').replaceAll('\\', '_');
+          const label = entry.name
+            .replace(/\.(xls|xlsx)$/i, '')
+            .replaceAll('/', '_')
+            .replaceAll('\\', '_');
 
           masterData[label] = {
             V: colToNumbers(body, idx.v),
@@ -868,35 +920,55 @@
 
       selectedSamples = [...sampleOrder];
       focusedSample = selectedSamples[0] || null;
+
       updateSampleSelect();
       updateSummary();
       drawPlots();
       updateRecent(file.name);
 
-      document.getElementById('sumStatus').innerHTML = '<span class="ok">● Analysis Complete</span>';
+      setHTML('sumStatus', '<span class="ok">● Analysis Complete</span>');
     } catch (e) {
       alert('ZIP 분석 실패: ' + e.message);
-      document.getElementById('sumStatus').textContent = 'Error';
+      setText('sumStatus', 'Error');
     }
   }
 
   function updateRecent(fileName) {
     const box = document.getElementById('recentFiles');
-    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    box.innerHTML = `<div class="recent-item">${fileName}<span>${today}</span></div>` +
-      sampleOrder.slice(0, 5).map(s => `<div class="recent-item">${s}<span>sample</span></div>`).join('');
+    if (!box) return;
+
+    const today = new Date().toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
+    box.innerHTML =
+      `<div class="recent-item">${fileName}<span>${today}</span></div>` +
+      sampleOrder
+        .slice(0, 5)
+        .map(s => `<div class="recent-item">${s}<span>sample</span></div>`)
+        .join('');
   }
 
   function updateSummary() {
-    document.getElementById('sumSamples').textContent = sampleOrder.length;
+    setText('sumSamples', sampleOrder.length);
+
     let points = 0;
-    for (const s of sampleOrder) points += masterData[s]?.V?.length || 0;
-    document.getElementById('sumPoints').textContent = points.toLocaleString();
+    for (const s of sampleOrder) {
+      points += masterData[s]?.V?.length || 0;
+    }
+
+    setText('sumPoints', points.toLocaleString());
   }
 
   function getInput(id) {
-    const v = document.getElementById(id).value.trim();
+    const el = document.getElementById(id);
+    if (!el) return null;
+
+    const v = el.value.trim();
     if (v === '') return null;
+
     const n = Number(v);
     return Number.isFinite(n) ? n : null;
   }
@@ -904,26 +976,42 @@
   function axisRange(minId, maxId) {
     const min = getInput(minId);
     const max = getInput(maxId);
+
     return (min !== null || max !== null) ? [min, max] : undefined;
   }
 
   function applyRange(layout, axisName, minId, maxId) {
     const r = axisRange(minId, maxId);
-    if (r) layout[axisName] = { ...(layout[axisName] || {}), range: r };
+
+    if (r) {
+      layout[axisName] = {
+        ...(layout[axisName] || {}),
+        range: r
+      };
+    }
   }
 
-  function makeTrace(x, y, name, i, yaxis='y', mode='lines+markers', showlegend=true) {
+  function makeTrace(x, y, name, i, yaxis = 'y', mode = 'lines+markers', showlegend = true) {
     return {
-      x, y, name, mode,
+      x,
+      y,
+      name,
+      mode,
       yaxis,
       showlegend,
       legendgroup: name,
-      line: { width: 2, color: colors[i % colors.length] },
+      line: {
+        width: 2.4,
+        color: colors[i % colors.length]
+      },
       marker: {
         symbol: markers[i % markers.length],
-        size: 5,
+        size: 6,
         color: 'white',
-        line: { color: colors[i % colors.length], width: 1.5 }
+        line: {
+          color: colors[i % colors.length],
+          width: 1.7
+        }
       },
       connectgaps: false
     };
@@ -931,62 +1019,61 @@
 
   function baseLayout(xTitle, yTitle) {
     return {
-      margin: { l: 70, r: 70, t: 55, b: 60 },
+      autosize: true,
+      margin: {
+        l: 95,
+        r: 95,
+        t: 80,
+        b: 80
+      },
       paper_bgcolor: '#ffffff',
       plot_bgcolor: '#ffffff',
-      font: { family: 'Arial, Noto Sans KR, sans-serif', size: 12 },
+      font: {
+        family: 'Arial, Noto Sans KR, sans-serif',
+        size: 15
+      },
       xaxis: {
-        title: xTitle,
+        title: {
+          text: xTitle,
+          font: { size: 17 }
+        },
         showgrid: true,
         gridcolor: '#e8e8e8',
         zeroline: false,
         linecolor: '#333',
         mirror: true,
-        ticks: 'inside'
+        ticks: 'inside',
+        tickfont: { size: 14 }
       },
       yaxis: {
-        title: yTitle,
+        title: {
+          text: yTitle,
+          font: { size: 17 }
+        },
         showgrid: true,
         gridcolor: '#e8e8e8',
         zeroline: false,
         linecolor: '#333',
         mirror: true,
-        ticks: 'inside'
+        ticks: 'inside',
+        tickfont: { size: 14 }
       },
       showlegend: true,
       legend: {
         orientation: 'h',
         x: 0.5,
-        y: 1.18,
+        y: 1.16,
         xanchor: 'center',
         yanchor: 'bottom',
-        font: { size: 10 },
+        font: { size: 12 },
         bgcolor: 'rgba(255,255,255,0)'
       }
     };
   }
 
-  function updatePlotLegends() {
-    const selected = selectedSamples.filter(s => masterData[s]);
-    const html = selected.length
-      ? selected.map((s, i) => {
-          const c = colors[i % colors.length];
-          return `
-            <span class="legend-item" title="${s}">
-              <span class="legend-symbol" style="color:${c}"></span>
-              ${s}
-            </span>`;
-        }).join('')
-      : '<span style="color:#777;font-weight:600;">No sample selected</span>';
-
-    ['legend1', 'legend2', 'legend3'].forEach(id => {
-      const box = document.getElementById(id);
-      if (box) box.innerHTML = html;
-    });
-  }
-
   function savePlot(plotId, filename) {
     const el = document.getElementById(plotId);
+
     if (!el || !el.data || !el.data.length) {
       alert('저장할 그래프가 없습니다.');
       return;
@@ -995,8 +1082,8 @@
     Plotly.downloadImage(el, {
       format: 'png',
       filename: filename.replace(/\.png$/i, ''),
-      width: 1200,
-      height: 900,
+      width: 1800,
+      height: 1300,
       scale: 3
     });
   }
@@ -1007,10 +1094,24 @@
     setTimeout(() => savePlot('plot3', 'OLED_EQE.png'), 1000);
   }
 
+  function resizeAllPlots() {
+    ['plot1', 'plot2', 'plot3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.data) {
+        Plotly.Plots.resize(el);
+      }
+    });
+  }
+
+  window.addEventListener('resize', resizeAllPlots);
+
   function drawPlots() {
     const selected = selectedSamples.filter(s => masterData[s]);
+
     if (!selected.length) {
-      Plotly.purge('plot1'); Plotly.purge('plot2'); Plotly.purge('plot3');
+      Plotly.purge('plot1');
+      Plotly.purge('plot2');
+      Plotly.purge('plot3');
       return;
     }
 
@@ -1023,6 +1124,7 @@
 
     selected.forEach((s, i) => {
       const d = masterData[s];
+
       traces1.push(makeTrace(d.V, d.J, s, i, 'y', 'lines+markers', true));
       traces1.push(makeTrace(d.V, d.L, s, i, 'y2', 'lines+markers', false));
 
@@ -1033,49 +1135,76 @@
     });
 
     const layout1 = baseLayout('Voltage (V)', 'Current Density (mA/cm²)');
+
     layout1.yaxis2 = {
-      title: 'Luminance (cd/m²)',
+      title: {
+        text: 'Luminance (cd/m²)',
+        font: { size: 17 }
+      },
       overlaying: 'y',
       side: 'right',
       type: 'log',
       showgrid: false,
       linecolor: '#333',
-      ticks: 'inside'
+      ticks: 'inside',
+      tickfont: { size: 14 }
     };
+
     if (logJ) layout1.yaxis.type = 'log';
+
     applyRange(layout1, 'xaxis', 'g1xmin', 'g1xmax');
     applyRange(layout1, 'yaxis', 'g1ymin', 'g1ymax');
     applyRange(layout1, 'yaxis2', 'g1y2min', 'g1y2max');
 
     const layout2 = baseLayout('Luminance (cd/m²)', 'Current Efficiency (cd/A)');
+
     layout2.yaxis2 = {
-      title: 'Power Efficiency (lm/W)',
+      title: {
+        text: 'Power Efficiency (lm/W)',
+        font: { size: 17 }
+      },
       overlaying: 'y',
       side: 'right',
       showgrid: false,
       linecolor: '#333',
-      ticks: 'inside'
+      ticks: 'inside',
+      tickfont: { size: 14 }
     };
+
     if (logL) layout2.xaxis.type = 'log';
+
     applyRange(layout2, 'xaxis', 'g2xmin', 'g2xmax');
     applyRange(layout2, 'yaxis', 'g2ymin', 'g2ymax');
     applyRange(layout2, 'yaxis2', 'g2y2min', 'g2y2max');
 
     const layout3 = baseLayout('Current Density (mA/cm²)', 'EQE (%)');
+
     if (logJ) layout3.xaxis.type = 'log';
+
     applyRange(layout3, 'xaxis', 'g3xmin', 'g3xmax');
     applyRange(layout3, 'yaxis', 'g3ymin', 'g3ymax');
 
-    const config = { responsive: true, displayModeBar: true };
+    const config = {
+      responsive: true,
+      displayModeBar: true,
+      scrollZoom: true
+    };
+
     Plotly.react('plot1', traces1, layout1, config);
     Plotly.react('plot2', traces2, layout2, config);
     Plotly.react('plot3', traces3, layout3, config);
+
+    setTimeout(resizeAllPlots, 80);
   }
 
   function resetScale() {
-    document.querySelectorAll('.scale-box input[type="text"], .scale-box input:not([type])').forEach(i => i.value = '');
+    document
+      .querySelectorAll('.scale-box input[type="text"], .scale-box input:not([type])')
+      .forEach(i => i.value = '');
+
     document.getElementById('logJ').checked = false;
     document.getElementById('logL').checked = false;
+
     drawPlots();
   }
 
@@ -1084,12 +1213,18 @@
     if (!box) return;
 
     box.innerHTML = '';
+
     sampleOrder.forEach(s => {
       const item = document.createElement('div');
-      item.className = 'sample-item' + (selectedSamples.includes(s) ? ' selected' : '');
+
+      item.className =
+        'sample-item' +
+        (selectedSamples.includes(s) ? ' selected' : '');
+
       item.textContent = s;
       item.title = s;
       item.onclick = () => toggleSample(s);
+
       box.appendChild(item);
     });
   }
@@ -1108,36 +1243,26 @@
     drawPlots();
   }
 
-  function openSampleModal() {
-    updateSampleSelect();
-  }
-
-  function closeSampleModal() {
-    drawPlots();
-  }
-
-  function syncSelectedFromModal() {
-    updateSampleSelect();
-    drawPlots();
-  }
-
   function selectAllSamples() {
     selectedSamples = [...sampleOrder];
     focusedSample = selectedSamples[0] || null;
+
     updateSampleSelect();
     drawPlots();
   }
-
 
   function clearAllSamples() {
     selectedSamples = [];
     focusedSample = null;
+
     updateSampleSelect();
     drawPlots();
   }
 
   function moveSample(direction) {
-    const name = focusedSample || (selectedSamples.length === 1 ? selectedSamples[0] : null);
+    const name =
+      focusedSample ||
+      (selectedSamples.length === 1 ? selectedSamples[0] : null);
 
     if (!name) {
       alert('정렬할 샘플을 하나 클릭해주세요.');
@@ -1149,8 +1274,12 @@
 
     if (newIdx < 0 || newIdx >= sampleOrder.length) return;
 
-    [sampleOrder[idx], sampleOrder[newIdx]] = [sampleOrder[newIdx], sampleOrder[idx]];
-    selectedSamples = selectedSamples.sort((a, b) => sampleOrder.indexOf(a) - sampleOrder.indexOf(b));
+    [sampleOrder[idx], sampleOrder[newIdx]] =
+      [sampleOrder[newIdx], sampleOrder[idx]];
+
+    selectedSamples = selectedSamples.sort(
+      (a, b) => sampleOrder.indexOf(a) - sampleOrder.indexOf(b)
+    );
 
     updateSampleSelect();
     drawPlots();
@@ -1159,40 +1288,92 @@
   function sheetFromColumns(columns) {
     const maxLen = Math.max(...columns.map(c => c.data.length));
     const aoa = [columns.map(c => c.name)];
+
     for (let i = 0; i < maxLen; i++) {
       aoa.push(columns.map(c => c.data[i] ?? null));
     }
+
     return XLSX.utils.aoa_to_sheet(aoa);
   }
 
   function exportExcel() {
     const ordered = selectedSamples.filter(s => masterData[s]);
-    if (!ordered.length) return alert('선택된 샘플이 없습니다.');
+
+    if (!ordered.length) {
+      return alert('선택된 샘플이 없습니다.');
+    }
 
     const wb = XLSX.utils.book_new();
 
     const jvlCols = [];
+
     ordered.forEach(s => {
-      jvlCols.push({ name: `${s}_V (V)`, data: masterData[s].V });
-      jvlCols.push({ name: `${s}_J (mA/cm2)`, data: masterData[s].J });
-      jvlCols.push({ name: `${s}_L (cd/m2)`, data: masterData[s].L });
+      jvlCols.push({
+        name: `${s}_V (V)`,
+        data: masterData[s].V
+      });
+
+      jvlCols.push({
+        name: `${s}_J (mA/cm2)`,
+        data: masterData[s].J
+      });
+
+      jvlCols.push({
+        name: `${s}_L (cd/m2)`,
+        data: masterData[s].L
+      });
     });
-    XLSX.utils.book_append_sheet(wb, sheetFromColumns(jvlCols), 'J-V-L');
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      sheetFromColumns(jvlCols),
+      'J-V-L'
+    );
 
     const cepeCols = [];
+
     ordered.forEach(s => {
-      cepeCols.push({ name: `${s}_L (cd/m2)`, data: masterData[s].L });
-      cepeCols.push({ name: `${s}_CE (cd/A)`, data: masterData[s].CE });
-      cepeCols.push({ name: `${s}_PE (lm/W)`, data: masterData[s].PE });
+      cepeCols.push({
+        name: `${s}_L (cd/m2)`,
+        data: masterData[s].L
+      });
+
+      cepeCols.push({
+        name: `${s}_CE (cd/A)`,
+        data: masterData[s].CE
+      });
+
+      cepeCols.push({
+        name: `${s}_PE (lm/W)`,
+        data: masterData[s].PE
+      });
     });
-    XLSX.utils.book_append_sheet(wb, sheetFromColumns(cepeCols), 'Efficiency_CEPE');
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      sheetFromColumns(cepeCols),
+      'Efficiency_CEPE'
+    );
 
     const eqeCols = [];
+
     ordered.forEach(s => {
-      eqeCols.push({ name: `${s}_J (mA/cm2)`, data: masterData[s].J });
-      eqeCols.push({ name: `${s}_EQE (%)`, data: masterData[s].EQE });
+      eqeCols.push({
+        name: `${s}_J (mA/cm2)`,
+        data: masterData[s].J
+      });
+
+      eqeCols.push({
+        name: `${s}_EQE (%)`,
+        data: masterData[s].EQE
+      });
     });
-    XLSX.utils.book_append_sheet(wb, sheetFromColumns(eqeCols), 'Efficiency_EQE');
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      sheetFromColumns(eqeCols),
+      'Efficiency_EQE'
+    );
 
     XLSX.writeFile(wb, 'OLED_Individual_V_Report.xlsx');
   }
